@@ -110,7 +110,7 @@ export default function MbtiTestPage() {
             ← Previous question
           </button>
           <p className="text-xs text-slate-600">
-            Sample question set — replace with your organisation&apos;s question bank in lib/questions.ts
+            {dichotomyLabel(question.dichotomy)} · item {step + 1}/{total}
           </p>
         </div>
       </main>
