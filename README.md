@@ -73,25 +73,8 @@ Each test item targets exactly one of four dichotomies; every dichotomy resolves
 letter of the 4-letter MBTI code, which the knowledge base then maps to a decision-maker
 archetype.
 
-```mermaid
-flowchart TB
-  Q[MBTI Question Bank] --> EI[Dichotomy: E–I<br/>Energy orientation]
-  Q --> SN[Dichotomy: S–N<br/>Information gathering]
-  Q --> TF[Dichotomy: T–F<br/>Decision basis]
-  Q --> JP[Dichotomy: J–P<br/>Lifestyle / structure]
-
-  EI --> E[Extraversion]
-  EI --> I[Introversion]
-  SN --> S[Sensing]
-  SN --> N[Intuition]
-  TF --> T[Thinking]
-  TF --> F[Feeling]
-  JP --> J[Judging]
-  JP --> P[Perceiving]
-
-  E & I & S & N & T & F & J & P --> Code[4-letter MBTI code]
-  Code --> Rules[IF-THEN Knowledge Base]
-  Rules --> Arch[Decision-maker archetype]
+```
+...
 ```
 
 > The real question bank is intentionally **not included** in this prototype
@@ -101,19 +84,110 @@ flowchart TB
 ---
 
 ## 7. Knowledge base: IF-THEN rules (excerpt)
+# MBTI Rule-Based Scoring System
 
-The full table lives in `lib/mbti.ts` (`archetypeRules`). The four archetypes called out
-in the assignment brief are the ones flagged `executiveFit: true`:
+## 1. Extrovert (E) or Introvert (I)
 
-| Rule | Condition (MBTI code) | Conclusion (Archetype) | Executive fit |
-|---|---|---|---|
-| R1 | IF code = ENTJ | THEN archetype = **The Commander** — decisive strategic driver | ✅ |
-| R2 | IF code = ESTJ | THEN archetype = **The Executive** — structured operational commander | ✅ |
-| R3 | IF code = INTJ | THEN archetype = **The Architect** — long-horizon systems planner | ✅ |
-| R4 | IF code = ISTJ | THEN archetype = **The Logistician** — methodical compliance-first executor | ✅ |
-| R5 | IF code = ENTP | THEN archetype = The Debater | — |
-| R6 | IF code = INTP | THEN archetype = The Logician | — |
-| … | … (16 rules total, one per MBTI code) | … | — |
+| Rule | IF: Q_ID | IF: Answer | THEN: Trait | THEN: Score |
+| ---- | -------- | ---------- | ----------- | ----------- |
+| R1   | EI_Q1    | a          | E           | +1          |
+| R2   | EI_Q1    | b          | I           | +1          |
+| R3   | EI_Q2    | a          | E           | +1          |
+| R4   | EI_Q2    | b          | I           | +1          |
+| R5   | EI_Q3    | a          | E           | +1          |
+| R6   | EI_Q3    | b          | I           | +1          |
+| R7   | EI_Q4    | a          | E           | +1          |
+| R8   | EI_Q4    | b          | I           | +1          |
+| R9   | EI_Q5    | a          | E           | +1          |
+| R10  | EI_Q5    | b          | I           | +1          |
+| R11  | EI_Q6    | a          | E           | +1          |
+| R12  | EI_Q6    | b          | I           | +1          |
+| R13  | EI_Q7    | a          | E           | +1          |
+| R14  | EI_Q7    | b          | I           | +1          |
+| R15  | EI_Q8    | a          | E           | +1          |
+| R16  | EI_Q8    | b          | I           | +1          |
+
+---
+
+## 2. Sensing (S) or Intuition (N)
+
+| Rule | IF: Q_ID | IF: Answer | THEN: Trait | THEN: Score |
+| ---- | -------- | ---------- | ----------- | ----------- |
+| R17  | SN_Q1    | a          | S           | +1          |
+| R18  | SN_Q1    | b          | N           | +1          |
+| R19  | SN_Q2    | a          | S           | +1          |
+| R20  | SN_Q2    | b          | N           | +1          |
+| R21  | SN_Q3    | a          | S           | +1          |
+| R22  | SN_Q3    | b          | N           | +1          |
+| R23  | SN_Q4    | a          | S           | +1          |
+| R24  | SN_Q4    | b          | N           | +1          |
+| R25  | SN_Q5    | a          | S           | +1          |
+| R26  | SN_Q5    | b          | N           | +1          |
+| R27  | SN_Q6    | a          | S           | +1          |
+| R28  | SN_Q6    | b          | N           | +1          |
+| R29  | SN_Q7    | a          | S           | +1          |
+| R30  | SN_Q7    | b          | N           | +1          |
+
+---
+
+## 3. Thinking (T) or Feeling (F)
+
+| Rule | IF: Q_ID | IF: Answer | THEN: Trait | THEN: Score |
+| ---- | -------- | ---------- | ----------- | ----------- |
+| R31  | TF_Q1    | a          | T           | +1          |
+| R32  | TF_Q1    | b          | F           | +1          |
+| R33  | TF_Q2    | a          | T           | +1          |
+| R34  | TF_Q2    | b          | F           | +1          |
+| R35  | TF_Q3    | a          | T           | +1          |
+| R36  | TF_Q3    | b          | F           | +1          |
+| R37  | TF_Q4    | a          | T           | +1          |
+| R38  | TF_Q4    | b          | F           | +1          |
+| R39  | TF_Q5    | a          | T           | +1          |
+| R40  | TF_Q5    | b          | F           | +1          |
+| R41  | TF_Q6    | a          | T           | +1          |
+| R42  | TF_Q6    | b          | F           | +1          |
+| R43  | TF_Q7    | a          | T           | +1          |
+| R44  | TF_Q7    | b          | F           | +1          |
+| R45  | TF_Q8    | a          | T           | +1          |
+| R46  | TF_Q8    | b          | F           | +1          |
+
+---
+
+## 4. Judging (J) or Perceiving (P)
+
+| Rule | IF: Q_ID | IF: Answer | THEN: Trait | THEN: Score |
+| ---- | -------- | ---------- | ----------- | ----------- |
+| R47  | JP_Q1    | a          | J           | +1          |
+| R48  | JP_Q1    | b          | P           | +1          |
+| R49  | JP_Q2    | a          | J           | +1          |
+| R50  | JP_Q2    | b          | P           | +1          |
+| R51  | JP_Q3    | a          | J           | +1          |
+| R52  | JP_Q3    | b          | P           | +1          |
+| R53  | JP_Q4    | a          | J           | +1          |
+| R54  | JP_Q4    | b          | P           | +1          |
+| R55  | JP_Q5    | a          | J           | +1          |
+| R56  | JP_Q5    | b          | P           | +1          |
+| R57  | JP_Q6    | a          | J           | +1          |
+| R58  | JP_Q6    | b          | P           | +1          |
+| R59  | JP_Q7    | a          | J           | +1          |
+| R60  | JP_Q7    | b          | P           | +1          |
+
+---
+
+# Trait Resolution Rules — Layer 2
+
+After calculating the scores from Layer 1, the dominant trait for each MBTI dimension is determined using the following rules.
+
+| Rule | IF                | THEN            |
+| ---- | ----------------- | --------------- |
+| D1   | E_score > I_score | Dominant_EI = E |
+| D1'  | E_score ≤ I_score | Dominant_EI = I |
+| D2   | S_score > N_score | Dominant_SN = S |
+| D2'  | S_score ≤ N_score | Dominant_SN = N |
+| D3   | T_score > F_score | Dominant_TF = T |
+| D3'  | T_score ≤ F_score | Dominant_TF = F |
+| D4   | J_score > P_score | Dominant_JP = J |
+| D4'  | J_score ≤ P_score | Dominant_JP = P |
 
 HR Executives can filter the company view to **executive-fit archetypes only** when
 shortlisting candidates for upper-management roles.
