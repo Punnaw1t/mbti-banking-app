@@ -35,104 +35,23 @@ Login → Company MBTI Overview (all staff) → Send email follow-up
 ## 2. DSS architecture (Data / Model / Knowledge / Interface)
 
 ```
-┌───────────────────────────────────────────────────────────────────────┐
-│                          INTERFACE COMPONENT                          │
-│   Next.js pages: /login /register /mbti-test /result /dashboard       │
-│   /company   +   shared components (TopBar, ArchetypeBadge, Modal)    │
-└───────────────▲───────────────────────────────────────▲───────────────┘
-                │                                        │
-┌───────────────┴───────────────┐        ┌───────────────┴───────────────┐
-│         MODEL COMPONENT        │        │       KNOWLEDGE COMPONENT      │
-│ lib/mbti.ts                    │        │ lib/mbti.ts — archetypeRules   │
-│  • scoreAnswers()               │        │  IF-THEN production rules      │
-│  • typeFromScores()             │        │  mapping MBTI code →           │
-│  • dichotomyPercents()          │        │  decision-maker archetype      │
-└───────────────▲───────────────┘        └───────────────▲───────────────┘
-                │                                        │
-                └───────────────────┬────────────────────┘
-                                     │
-                        ┌────────────┴────────────┐
-                        │      DATA COMPONENT      │
-                        │ lib/store.ts             │
-                        │  Users, Test Results,    │
-                        │  Email Log (localStorage │
-                        │  mock; swap for a real   │
-                        │  DB/API in production)   │
-                        └──────────────────────────┘
+...
 ```
 
 ---
 
 ## 3. Structure chart
 
-```mermaid
-flowchart TB
-  A[Meridian DSS] --> B[Interface Module]
-  A --> C[Model Module]
-  A --> D[Knowledge Module]
-  A --> E[Data Module]
-
-  B --> B1[Auth Screens<br/>Login / Register]
-  B --> B2[Assessment Screen<br/>MBTI Test]
-  B --> B3[Result Screen]
-  B --> B4[Employee Dashboard]
-  B --> B5[Company Oversight Screen]
-  B --> B6[Send-Email Modal]
-
-  C --> C1[scoreAnswers]
-  C --> C2[typeFromScores]
-  C --> C3[dichotomyPercents]
-
-  D --> D1[archetypeRules<br/>IF-THEN table]
-  D --> D2[getArchetype]
-
-  E --> E1[User records]
-  E --> E2[Test Result records]
-  E --> E3[Email Log records]
+```
+...
 ```
 
 ---
 
 ## 4. Use case diagram
 
-```mermaid
-flowchart LR
-  Employee((Employee))
-  HR((HR Executive))
-  Mgr((Engineering Manager /<br/>Product Owner / CTO /<br/>Risk-Compliance Officer))
-
-  subgraph Meridian DSS
-    UC1([Register account])
-    UC2([Log in])
-    UC3([Take MBTI test])
-    UC4([View own result])
-    UC5([View personal dashboard])
-    UC6([View company MBTI overview])
-    UC7([Filter staff by dept / archetype])
-    UC8([Send follow-up email])
-    UC9([Identify executive-fit candidates])
-  end
-
-  Employee --> UC1
-  Employee --> UC2
-  Employee --> UC3
-  Employee --> UC4
-  Employee --> UC5
-
-  HR --> UC2
-  HR --> UC6
-  HR --> UC7
-  HR --> UC8
-  HR --> UC9
-
-  Mgr --> UC2
-  Mgr --> UC6
-  Mgr --> UC7
-  Mgr --> UC8
-  Mgr --> UC9
-
-  UC3 -.include.-> UC4
-  UC8 -.include.-> UC6
+```
+...
 ```
 
 ---
@@ -142,57 +61,8 @@ flowchart LR
 The prototype stores this shape in `localStorage`; the same schema maps directly onto
 relational tables for a production build.
 
-```mermaid
-erDiagram
-  DEPARTMENT ||--o{ USER : "employs"
-  USER ||--o| TEST_RESULT : "has"
-  TEST_RESULT }o--|| ARCHETYPE : "classified as"
-  USER ||--o{ EMAIL_LOG : "receives"
-  HR_USER ||--o{ EMAIL_LOG : "sends"
-
-  DEPARTMENT {
-    string department_name PK
-    boolean is_hr_flow
-  }
-  USER {
-    string id PK
-    string name
-    string username
-    string email
-    string password
-    string department_name FK
-    datetime created_at
-  }
-  TEST_RESULT {
-    string id PK
-    string user_id FK
-    int score_E
-    int score_I
-    int score_S
-    int score_N
-    int score_T
-    int score_F
-    int score_J
-    int score_P
-    string mbti_code FK
-    datetime completed_at
-  }
-  ARCHETYPE {
-    string mbti_code PK
-    string name
-    string group
-    string decision_style
-    string description
-    boolean executive_fit
-  }
-  EMAIL_LOG {
-    string id PK
-    string to_user_id FK
-    string sent_by_user_id FK
-    string subject
-    string body
-    datetime sent_at
-  }
+```
+...
 ```
 
 ---
