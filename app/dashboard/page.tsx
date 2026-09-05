@@ -79,6 +79,10 @@ export default function DashboardPage() {
                     <div className="h-full bg-brass" style={{ width: `${r.leftPct}%` }} />
                     <div className="h-full bg-slate-400/40" style={{ width: `${100 - r.leftPct}%` }} />
                   </div>
+                  <div className="flex justify-between text-xs text-slate-500 mt-1">
+                    <span>{r.leftPct}%</span>
+                    <span>{100 - r.leftPct}%</span>
+                  </div>
                 </div>
               ))}
             </div>
