@@ -61,7 +61,8 @@ export interface Archetype {
   code: MbtiCode;
   name: string;          // e.g. "Commander"
   group: MbtiGroup;
-  decisionStyle: string; // short label used on dashboards
+  decisionStyle: string;       // short label used on dashboards
+  decisionStyleDetail: string; // one sentence elaborating on the label
   description: string;
   executiveFit: boolean; // highlighted as a core upper-management archetype
   icon: string;          // single emoji used as a lightweight "cartoon" avatar

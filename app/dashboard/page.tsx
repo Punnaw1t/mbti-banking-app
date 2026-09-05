@@ -87,6 +87,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Decision style summary</p>
                 <p className="text-sm text-slate-200">{archetype.decisionStyle}</p>
+                <p className="text-sm text-slate-300 [html.light_&]:text-black mt-1">{archetype.decisionStyleDetail}</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">MBTI colour group</p>

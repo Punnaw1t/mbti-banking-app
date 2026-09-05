@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store";
 import { User, EmailLogEntry } from "@/lib/types";
+import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
 import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
@@ -55,6 +56,12 @@ export default function CompanyPage() {
     return { total: employees.length, completed, pending: employees.length - completed, executiveFit };
   }, [employees]);
 
+  function handleExportCsv() {
+    const csv = buildEmployeeCsv(filtered);
+    const date = new Date().toISOString().slice(0, 10);
+    downloadCsv(`meridian-decision-style-summary-${date}.csv`, csv);
+  }
+
   function handleSend(subject: string, body: string) {
     if (!target || !me) return;
     logEmail({
@@ -81,13 +88,21 @@ export default function CompanyPage() {
       <TopBar user={me} tag="Company Decision-Style Oversight" />
 
       <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
-        <div className="mb-8">
-          <p className="text-xs uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
-          <h1 className="font-display text-3xl text-slate-50">Company MBTI Overview</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Review decision-making personality and style across candidates for upper-management roles, and follow up
-            with employees directly.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
+            <h1 className="font-display text-3xl text-slate-50">Company MBTI Overview</h1>
+            <p className="text-slate-400 text-sm mt-1">
+              Review decision-making personality and style across candidates for upper-management roles, and follow up
+              with employees directly.
+            </p>
+          </div>
+          <button
+            onClick={handleExportCsv}
+            className="text-sm px-4 py-2.5 rounded-md bg-brass text-midnight font-medium hover:bg-brass-light transition-colors self-start whitespace-nowrap"
+          >
+            Export for Visualize
+          </button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
@@ -121,6 +136,9 @@ export default function CompanyPage() {
             Executive-fit archetypes only
           </label>
         </div>
+        <p className="text-xs text-slate-500 -mt-3 mb-5">
+          "Export CSV" downloads the {filtered.length} employee{filtered.length === 1 ? "" : "s"} matching the filters above.
+        </p>
 
         <div className="bg-ink-800 border border-hairline/10 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
