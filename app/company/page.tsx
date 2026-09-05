@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store";
 import { User, EmailLogEntry } from "@/lib/types";
 import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
+import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
 import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
-import SendEmailModal from "@/components/SendEmailModal";
 
 const DEPT_FILTERS = [
   "All departments", "Retail Banking", "Corporate Banking", "Customer Service",
@@ -22,7 +22,6 @@ export default function CompanyPage() {
   const [deptFilter, setDeptFilter] = useState("All departments");
   const [executiveOnly, setExecutiveOnly] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "pending">("all");
-  const [target, setTarget] = useState<User | null>(null);
   const [log, setLog] = useState<EmailLogEntry[]>([]);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -62,8 +61,9 @@ export default function CompanyPage() {
     downloadCsv(`meridian-decision-style-summary-${date}.csv`, csv);
   }
 
-  function handleSend(subject: string, body: string) {
-    if (!target || !me) return;
+  function handleFollowUpClick(target: User) {
+    if (!me) return;
+    const { subject, body } = buildFollowUpEmail(target, me.name);
     logEmail({
       id: "e-" + Date.now(),
       toUserId: target.id,
@@ -73,8 +73,7 @@ export default function CompanyPage() {
       sentAt: new Date().toISOString(),
       sentBy: me.name,
     });
-    setTarget(null);
-    setToast(`Email sent to ${target.name} (mock — no real message was dispatched).`);
+    setToast(`Opening your email client to message ${target.name}…`);
     refresh();
     setTimeout(() => setToast(null), 4000);
   }
@@ -178,12 +177,7 @@ export default function CompanyPage() {
                       )}
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => setTarget(emp)}
-                        className="text-xs px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
-                      >
-                        {emp.result ? "Send follow-up" : "Send reminder"}
-                      </button>
+                      <FollowUpLink employee={emp} fromName={me.name} onClick={() => handleFollowUpClick(emp)} />
                     </td>
                   </tr>
                 ))}
@@ -197,7 +191,7 @@ export default function CompanyPage() {
 
         {log.length > 0 && (
           <div className="mt-8">
-            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Recent outbound emails (mock log)</p>
+            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Recent follow-ups (opened in your email client)</p>
             <div className="space-y-2">
               {log.slice(0, 5).map((entry) => (
                 <div key={entry.id} className="bg-ink-800 border border-hairline/10 rounded-md px-4 py-3 text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -210,21 +204,33 @@ export default function CompanyPage() {
         )}
       </main>
 
-      {target && (
-        <SendEmailModal
-          target={target}
-          fromName={me.name}
-          onClose={() => setTarget(null)}
-          onSend={handleSend}
-        />
-      )}
-
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink-700 border border-brass/40 text-slate-50 text-sm px-5 py-3 rounded-md shadow-panel">
           {toast}
         </div>
       )}
     </div>
+  );
+}
+
+function FollowUpLink({
+  employee,
+  fromName,
+  onClick,
+}: {
+  employee: User;
+  fromName: string;
+  onClick: () => void;
+}) {
+  const { subject, body } = buildFollowUpEmail(employee, fromName);
+  return (
+    <a
+      href={buildMailtoHref(employee.email, subject, body)}
+      onClick={onClick}
+      className="inline-block text-xs px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
+    >
+      {employee.result ? "Send follow-up" : "Send reminder"}
+    </a>
   );
 }
 
