@@ -65,7 +65,7 @@ export interface Archetype {
   decisionStyleDetail: string; // one sentence elaborating on the label
   description: string;
   executiveFit: boolean; // highlighted as a core upper-management archetype
-  icon: string;          // single emoji used as a lightweight "cartoon" avatar
+  icon: string;          // path to the archetype's SVG icon (public/mbti-icons/*.svg)
 }
 
 export interface TestResult {

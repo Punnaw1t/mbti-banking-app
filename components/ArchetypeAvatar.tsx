@@ -1,10 +1,11 @@
+import Image from "next/image";
 import { Archetype } from "@/lib/types";
 import { GROUP_META } from "@/lib/groups";
 
 const SIZES = {
-  sm: { wrap: "h-9 w-9", emoji: "text-base" },
-  md: { wrap: "h-14 w-14", emoji: "text-2xl" },
-  lg: { wrap: "h-20 w-20", emoji: "text-4xl" },
+  sm: { wrap: "h-[72px] w-[72px]", icon: 52 },
+  md: { wrap: "h-28 w-28", icon: 84 },
+  lg: { wrap: "h-40 w-40", icon: 124 },
 } as const;
 
 export default function ArchetypeAvatar({
@@ -15,7 +16,7 @@ export default function ArchetypeAvatar({
   size?: keyof typeof SIZES;
 }) {
   const meta = GROUP_META[archetype.group];
-  const { wrap, emoji } = SIZES[size];
+  const { wrap, icon } = SIZES[size];
 
   return (
     <span
@@ -24,7 +25,7 @@ export default function ArchetypeAvatar({
       aria-label={`${archetype.name} (${archetype.group}) mascot`}
       title={`${archetype.name} — ${archetype.group}`}
     >
-      <span className={emoji}>{archetype.icon}</span>
+      <Image src={archetype.icon} alt="" width={icon} height={icon} unoptimized />
     </span>
   );
 }
