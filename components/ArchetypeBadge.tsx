@@ -12,7 +12,7 @@ export default function ArchetypeBadge({ archetype, size = "md" }: { archetype: 
       className={`inline-flex items-center gap-1.5 rounded-full border ${sizes} ${
         archetype.executiveFit
           ? "border-brass/60 bg-brass/10 text-brass-light"
-          : "border-slate-400/30 bg-white/5 text-slate-200"
+          : "border-slate-400/30 bg-hairline/5 text-slate-200"
       }`}
     >
       <span className="font-medium">{archetype.code}</span>

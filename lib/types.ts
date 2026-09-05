@@ -55,13 +55,16 @@ export type MbtiCode =
   | "ESTP" | "ESFP" | "ENFP" | "ENTP"
   | "ESTJ" | "ESFJ" | "ENFJ" | "ENTJ";
 
+export type MbtiGroup = "Analyst" | "Diplomat" | "Sentinel" | "Explorer";
+
 export interface Archetype {
   code: MbtiCode;
   name: string;          // e.g. "Commander"
-  group: "Analyst" | "Diplomat" | "Sentinel" | "Explorer";
+  group: MbtiGroup;
   decisionStyle: string; // short label used on dashboards
   description: string;
   executiveFit: boolean; // highlighted as a core upper-management archetype
+  icon: string;          // single emoji used as a lightweight "cartoon" avatar
 }
 
 export interface TestResult {

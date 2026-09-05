@@ -2,9 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+
+  /* Dark theme (default) — matches the original design exactly. */
+  --ink: 14 26 43;
+  --ink-800: 19 34 56;
+  --ink-700: 24 44 72;
+  --ink-600: 32 55 89;
+  --slate-50: 237 239 243;
+  --slate-200: 199 205 216;
+  --slate-400: 133 146 166;
+  --slate-600: 84 96 118;
+  --hairline: 255 255 255;
+  --brass-light: 212 180 131;
+}
+
+html.light {
+  color-scheme: light;
+
+  --ink: 244 245 247;
+  --ink-800: 255 255 255;
+  --ink-700: 240 241 244;
+  --ink-600: 226 229 234;
+  --slate-50: 15 23 35;
+  --slate-200: 51 65 85;
+  --slate-400: 100 116 139;
+  --slate-600: 148 163 184;
+  --hairline: 15 23 35;
+  --brass-light: 124 90 46;
+}
+
 html, body {
-  background-color: #0E1A2B;
-  color: #EDEFF3;
+  background-color: rgb(var(--ink));
+  color: rgb(var(--slate-50));
 }
 
 * {

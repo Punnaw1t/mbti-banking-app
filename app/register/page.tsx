@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUser, findByUsername, setSession } from "@/lib/store";
 import { Department } from "@/lib/types";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const DEPARTMENTS: Department[] = [
   "Retail Banking",
@@ -55,6 +56,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-12">
+      <ThemeToggle className="fixed top-4 right-4 bg-ink-800" />
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
@@ -64,37 +66,37 @@ export default function RegisterPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-ink-800 border border-white/10 rounded-lg shadow-panel p-6 sm:p-8 space-y-5"
+          className="bg-ink-800 border border-hairline/10 rounded-lg shadow-panel p-6 sm:p-8 space-y-5"
         >
           <div>
             <label className="block text-sm text-slate-200 mb-1.5" htmlFor="name">Full name</label>
             <input id="name" value={name} onChange={(e) => setName(e.target.value)} required
-              className="w-full rounded-md bg-ink-700 border border-white/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
+              className="w-full rounded-md bg-ink-700 border border-hairline/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
           </div>
 
           <div>
             <label className="block text-sm text-slate-200 mb-1.5" htmlFor="username">Username</label>
             <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required
-              className="w-full rounded-md bg-ink-700 border border-white/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
+              className="w-full rounded-md bg-ink-700 border border-hairline/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
           </div>
 
           <div>
             <label className="block text-sm text-slate-200 mb-1.5" htmlFor="email">Work email</label>
             <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
               placeholder="name@siambankcorp.com"
-              className="w-full rounded-md bg-ink-700 border border-white/10 px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-slate-600 focus:border-brass outline-none" />
+              className="w-full rounded-md bg-ink-700 border border-hairline/10 px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-slate-600 focus:border-brass outline-none" />
           </div>
 
           <div>
             <label className="block text-sm text-slate-200 mb-1.5" htmlFor="password">Password</label>
             <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-              className="w-full rounded-md bg-ink-700 border border-white/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
+              className="w-full rounded-md bg-ink-700 border border-hairline/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none" />
           </div>
 
           <div>
             <label className="block text-sm text-slate-200 mb-1.5" htmlFor="department">Department</label>
             <select id="department" value={department} onChange={(e) => setDepartment(e.target.value as Department)}
-              className="w-full rounded-md bg-ink-700 border border-white/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none">
+              className="w-full rounded-md bg-ink-700 border border-hairline/10 px-3.5 py-2.5 text-sm text-slate-50 focus:border-brass outline-none">
               {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
@@ -104,7 +106,7 @@ export default function RegisterPage() {
           )}
 
           <button type="submit"
-            className="w-full rounded-md bg-brass text-ink font-medium py-2.5 text-sm hover:bg-brass-light transition-colors">
+            className="w-full rounded-md bg-brass text-midnight font-medium py-2.5 text-sm hover:bg-brass-light transition-colors">
             Create account &amp; continue
           </button>
 

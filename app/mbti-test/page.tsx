@@ -69,7 +69,7 @@ export default function MbtiTestPage() {
             <span>Question {step + 1} of {total}</span>
             <span>{progressPct}% complete</span>
           </div>
-          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-hairline/10 overflow-hidden">
             <div
               className="h-full bg-brass transition-all duration-300"
               style={{ width: `${progressPct}%` }}
@@ -87,14 +87,14 @@ export default function MbtiTestPage() {
         <div className="space-y-4">
           <button
             onClick={() => choose(question.optionA.trait)}
-            className="w-full text-left rounded-lg border border-white/10 bg-ink-800 hover:border-brass hover:bg-ink-700 transition-colors p-5"
+            className="w-full text-left rounded-lg border border-hairline/10 bg-ink-800 hover:border-brass hover:bg-ink-700 transition-colors p-5"
           >
             <p className="text-sm text-slate-400 mb-1">A</p>
             <p className="text-slate-50">{question.optionA.label}</p>
           </button>
           <button
             onClick={() => choose(question.optionB.trait)}
-            className="w-full text-left rounded-lg border border-white/10 bg-ink-800 hover:border-brass hover:bg-ink-700 transition-colors p-5"
+            className="w-full text-left rounded-lg border border-hairline/10 bg-ink-800 hover:border-brass hover:bg-ink-700 transition-colors p-5"
           >
             <p className="text-sm text-slate-400 mb-1">B</p>
             <p className="text-slate-50">{question.optionB.label}</p>
