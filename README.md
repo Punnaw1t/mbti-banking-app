@@ -1,12 +1,10 @@
 # Meridian — MBTI Executive Decision-Support System (DSS)
 
-**Business domain:** Banking (Siam Bank Corp, fictional) — Retail Banking, Corporate Banking,
-Customer Service, Finance & Accounting, IT, Human Resources, Engineering, Product, and
-Executive/Risk functions.
+**Business domain:** Banking Technology Company — This system called "Decision Style Assessment Tool for Banking Tech Leaders", Designed for helping the fintech and banking technology industry. It focuses on Engineering Managers, Product Owners, Chief Technology Officers (CTOs), and Risk/Compliance Officers. These roles are responsible for decisions involving areas such as incident response, sprint prioritization, platform architecture, digital banking systems, and regulatory compliance.
 
-**Purpose:** A mock-up prototype that helps an **HR Executive** use MBTI temperament results to
-understand the decision-making personality and style of candidates being considered for
-**upper-management roles**, and to manage follow-up communication with staff.
+**Purpose:** The purpose of the system is to understand how engineering leaders and managers make decisions by assessing their MBTI personality type and mapping the result to one of four Executive Decision Maker Styles.
+
+The system helps identify whether a leader's natural decision-making style matches the requirements of their role. If a mismatch is found, the organization can use the results to support better role placement, leadership development, and improved decision-making effectiveness.
 
 Stack: **Next.js 14 (App Router) + TypeScript + Tailwind CSS**, fully responsive, mock
 localStorage-backed data layer (no external DB/API needed to run the prototype).
