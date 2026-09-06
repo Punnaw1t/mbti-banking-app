@@ -6,6 +6,7 @@ import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store"
 import { User, EmailLogEntry } from "@/lib/types";
 import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
 import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
+import { getArchetype } from "@/lib/mbti";
 import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
@@ -47,7 +48,7 @@ export default function CompanyPage() {
     return employees.filter((e) => {
       if (query && !e.name.toLowerCase().includes(query)) return false;
       if (deptFilter !== "All departments" && e.department !== deptFilter) return false;
-      if (executiveOnly && !e.result?.archetype.executiveFit) return false;
+      if (executiveOnly && !(e.result && getArchetype(e.result.mbtiType).executiveFit)) return false;
       if (statusFilter === "completed" && !e.result) return false;
       if (statusFilter === "pending" && e.result) return false;
       return true;
@@ -56,7 +57,7 @@ export default function CompanyPage() {
 
   const stats = useMemo(() => {
     const completed = employees.filter((e) => e.result).length;
-    const executiveFit = employees.filter((e) => e.result?.archetype.executiveFit).length;
+    const executiveFit = employees.filter((e) => e.result && getArchetype(e.result.mbtiType).executiveFit).length;
     return { total: employees.length, completed, pending: employees.length - completed, executiveFit };
   }, [employees]);
 
@@ -165,7 +166,9 @@ export default function CompanyPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((emp) => (
+                {filtered.map((emp) => {
+                  const archetype = emp.result ? getArchetype(emp.result.mbtiType) : undefined;
+                  return (
                   <tr
                     key={emp.id}
                     onClick={() => setViewing(emp)}
@@ -177,10 +180,10 @@ export default function CompanyPage() {
                     </td>
                     <td className="px-5 py-4 text-slate-300 [html.light_&]:text-black">{emp.department}</td>
                     <td className="px-5 py-4">
-                      {emp.result ? (
+                      {archetype ? (
                         <div className="flex items-center gap-2">
-                          <ArchetypeAvatar archetype={emp.result.archetype} size="sm" />
-                          <ArchetypeBadge archetype={emp.result.archetype} size="sm" />
+                          <ArchetypeAvatar archetype={archetype} size="sm" />
+                          <ArchetypeBadge archetype={archetype} size="sm" />
                         </div>
                       ) : (
                         <span className="text-slate-600 text-xs">Not assessed</span>
@@ -197,7 +200,8 @@ export default function CompanyPage() {
                       <FollowUpLink employee={emp} fromName={me.name} onClick={() => handleFollowUpClick(emp)} />
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
                 {filtered.length === 0 && (
                   <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-500 text-sm">No employees match these filters.</td></tr>
                 )}

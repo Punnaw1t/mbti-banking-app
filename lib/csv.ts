@@ -1,5 +1,5 @@
 import { User } from "./types";
-import { dichotomyPercents } from "./mbti";
+import { dichotomyPercents, getArchetype } from "./mbti";
 
 function csvCell(value: string | number): string {
   const s = String(value);
@@ -34,6 +34,7 @@ const CSV_HEADERS = [
 export function buildEmployeeCsv(employees: User[]): string {
   const rows = employees.map((e) => {
     const r = e.result;
+    const archetype = r ? getArchetype(r.mbtiType) : null;
     const pct = r ? dichotomyPercents(r.scores) : null;
     const cells: (string | number)[] = [
       e.name,
@@ -41,11 +42,11 @@ export function buildEmployeeCsv(employees: User[]): string {
       e.department,
       r ? "Completed" : "Pending",
       r?.mbtiType ?? "",
-      r?.archetype.name ?? "",
-      r?.archetype.group ?? "",
-      r?.archetype.decisionStyle ?? "",
-      r?.archetype.decisionStyleDetail ?? "",
-      r ? (r.archetype.executiveFit ? "Yes" : "No") : "",
+      archetype?.name ?? "",
+      archetype?.group ?? "",
+      archetype?.decisionStyle ?? "",
+      archetype?.decisionStyleDetail ?? "",
+      archetype ? (archetype.executiveFit ? "Yes" : "No") : "",
       r ? new Date(r.completedAt).toISOString() : "",
       pct ? pct.EI.leftPct : "",
       pct ? 100 - pct.EI.leftPct : "",

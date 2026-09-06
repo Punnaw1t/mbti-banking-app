@@ -8,7 +8,7 @@ import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
 import { GROUP_META } from "@/lib/groups";
-import { dichotomyPercents } from "@/lib/mbti";
+import { dichotomyPercents, getArchetype } from "@/lib/mbti";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,7 +26,8 @@ export default function DashboardPage() {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-slate-400 text-sm">Loading dashboard…</p></div>;
   }
 
-  const { mbtiType, archetype, completedAt } = user.result;
+  const { mbtiType, completedAt } = user.result;
+  const archetype = getArchetype(mbtiType);
   const pct = dichotomyPercents(user.result.scores);
 
   return (

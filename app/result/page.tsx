@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSessionUser } from "@/lib/store";
 import { User } from "@/lib/types";
-import { dichotomyPercents } from "@/lib/mbti";
+import { dichotomyPercents, getArchetype } from "@/lib/mbti";
 import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import { GROUP_META } from "@/lib/groups";
@@ -24,7 +24,8 @@ export default function ResultPage() {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-slate-400 text-sm">Loading result…</p></div>;
   }
 
-  const { mbtiType, archetype, scores } = user.result;
+  const { mbtiType, scores } = user.result;
+  const archetype = getArchetype(mbtiType);
   const pct = dichotomyPercents(scores);
 
   const rows = [

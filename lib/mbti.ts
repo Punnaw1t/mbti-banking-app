@@ -92,8 +92,7 @@ export function getArchetype(code: MbtiCode): Archetype {
 export function buildResult(answers: Trait[]): TestResult {
   const scores = scoreAnswers(answers);
   const mbtiType = typeFromScores(scores);
-  const archetype = getArchetype(mbtiType);
-  return { scores, mbtiType, archetype, completedAt: new Date().toISOString() };
+  return { scores, mbtiType, completedAt: new Date().toISOString() };
 }
 
 // Convenience: percentage split per dichotomy, used for result page bars.

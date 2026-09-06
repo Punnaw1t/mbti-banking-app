@@ -71,7 +71,10 @@ export interface Archetype {
 export interface TestResult {
   scores: Scores;
   mbtiType: MbtiCode;
-  archetype: Archetype;
+  // Archetype is intentionally NOT stored here — it's derived live from
+  // mbtiType via getArchetype() everywhere it's needed. Storing a snapshot
+  // would go stale whenever archetypeRules changes (e.g. a new icon), even
+  // for results that were saved long before the change.
   completedAt: string;
 }
 

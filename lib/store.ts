@@ -1,7 +1,6 @@
 "use client";
 
 import { Department, EmailLogEntry, User } from "./types";
-import { getArchetype } from "./mbti";
 
 // =========================================================================
 // DATA COMPONENT (DSS)
@@ -52,49 +51,49 @@ function seedEmployees(): User[] {
       id: "u-1001", name: "Aran Suksawat", username: "aran.suksawat", password: "password123",
       email: "aran.suksawat@siambankcorp.com", department: "Retail Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 2, I: 4, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", archetype: getArchetype("ISTJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 2, I: 4, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1002", name: "Nutcha Boonmee", username: "nutcha.boonmee", password: "password123",
       email: "nutcha.boonmee@siambankcorp.com", department: "Corporate Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 1, N: 5, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "ENTJ", archetype: getArchetype("ENTJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 5, I: 1, S: 1, N: 5, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "ENTJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1003", name: "Pim Charoensuk", username: "pim.charoensuk", password: "password123",
       email: "pim.charoensuk@siambankcorp.com", department: "Customer Service", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 4, I: 2, S: 5, N: 1, T: 1, F: 5, J: 4, P: 2 }, mbtiType: "ESFJ", archetype: getArchetype("ESFJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 4, I: 2, S: 5, N: 1, T: 1, F: 5, J: 4, P: 2 }, mbtiType: "ESFJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1004", name: "Somchai Rattanakul", username: "somchai.rattanakul", password: "password123",
       email: "somchai.rattanakul@siambankcorp.com", department: "Finance & Accounting", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", archetype: getArchetype("ISTJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 1, I: 5, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1005", name: "Kanya Wattana", username: "kanya.wattana", password: "password123",
       email: "kanya.wattana@siambankcorp.com", department: "IT Support", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 5, N: 1, T: 5, F: 1, J: 1, P: 5 }, mbtiType: "ISTP", archetype: getArchetype("ISTP"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 1, I: 5, S: 5, N: 1, T: 5, F: 1, J: 1, P: 5 }, mbtiType: "ISTP", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1006", name: "Nathan Wells", username: "nathan.wells", password: "password123",
       email: "nathan.wells@siambankcorp.com", department: "Corporate Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 6, F: 0, J: 6, P: 0 }, mbtiType: "ESTJ", archetype: getArchetype("ESTJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 6, F: 0, J: 6, P: 0 }, mbtiType: "ESTJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1007", name: "Ploy Sirichai", username: "ploy.sirichai", password: "password123",
       email: "ploy.sirichai@siambankcorp.com", department: "Retail Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 1, F: 5, J: 1, P: 5 }, mbtiType: "ESFP", archetype: getArchetype("ESFP"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 1, F: 5, J: 1, P: 5 }, mbtiType: "ESFP", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1008", name: "David Chan", username: "david.chan", password: "password123",
       email: "david.chan@siambankcorp.com", department: "Finance & Accounting", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 0, N: 6, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "INTJ", archetype: getArchetype("INTJ"), completedAt: new Date().toISOString() },
+      result: { scores: { E: 1, I: 5, S: 0, N: 6, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "INTJ", completedAt: new Date().toISOString() },
     },
     {
       id: "u-1009", name: "Warut Phetchara", username: "warut.phetchara", password: "password123",
