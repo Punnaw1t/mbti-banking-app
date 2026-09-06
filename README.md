@@ -15,12 +15,12 @@ localStorage-backed data layer (no external DB/API needed to run the prototype).
 
 **Flow 1 — Individual assessment (normal employees)**
 ```
-Register → Login → MBTI Test → Result → Dashboard
+Register → Login → Take MBTI Test → Get Result → Get suggestion
 ```
 
 **Flow 2 — HR / management oversight**
 ```
-Login → Company MBTI Overview (all staff) → Send email follow-up
+Register -> Login → Check employee MBTI status (Graph / Dashboard) → Suggest employee (sent via email)
 ```
 
 **Routing rule at Login** (also enforced at Register):
@@ -209,13 +209,13 @@ Figma if a high-fidelity mock is required for submission):
 ---
 
 ## 9. Getting started
-
+1. Open terminal in your Machine
+2. Run this command
 ```bash
 npm install
 npm run dev
 ```
-
-Then open http://localhost:3000.
+3. Then open http://localhost:3000.
 
 **Demo accounts** (seeded automatically on first load):
 
