@@ -217,8 +217,10 @@ npm run dev
 ```
 3. Then open http://localhost:3000.
 
-**Demo accounts** (seeded automatically on first load):
+---
 
+## 10. Demo accounts 
+(seeded automatically on first load):
 | Username | Password | Department | Flow |
 |---|---|---|---|
 | aran.suksawat | password123 | Retail Banking | Flow 1 (has a result) |
