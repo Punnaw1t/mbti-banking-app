@@ -9,6 +9,7 @@ import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
 import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
+import EmployeeDetailModal from "@/components/EmployeeDetailModal";
 
 const DEPT_FILTERS = [
   "All departments", "Retail Banking", "Corporate Banking", "Customer Service",
@@ -24,6 +25,7 @@ export default function CompanyPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "pending">("all");
   const [log, setLog] = useState<EmailLogEntry[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const [viewing, setViewing] = useState<User | null>(null);
 
   useEffect(() => {
     const u = getSessionUser();
@@ -153,7 +155,11 @@ export default function CompanyPage() {
               </thead>
               <tbody>
                 {filtered.map((emp) => (
-                  <tr key={emp.id} className="border-b border-hairline/5 last:border-0">
+                  <tr
+                    key={emp.id}
+                    onClick={() => setViewing(emp)}
+                    className="border-b border-hairline/5 last:border-0 cursor-pointer hover:bg-hairline/5 transition-colors"
+                  >
                     <td className="px-5 py-4">
                       <p className="text-slate-50">{emp.name}</p>
                       <p className="text-xs text-slate-500">{emp.email}</p>
@@ -176,7 +182,7 @@ export default function CompanyPage() {
                         <span className="text-signal-amber text-xs">Pending</span>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <FollowUpLink employee={emp} fromName={me.name} onClick={() => handleFollowUpClick(emp)} />
                     </td>
                   </tr>
@@ -203,6 +209,8 @@ export default function CompanyPage() {
           </div>
         )}
       </main>
+
+      {viewing && <EmployeeDetailModal employee={viewing} onClose={() => setViewing(null)} />}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink-700 border border-brass/40 text-slate-50 text-sm px-5 py-3 rounded-md shadow-panel">
