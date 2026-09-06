@@ -21,6 +21,7 @@ export default function CompanyPage() {
   const [me, setMe] = useState<User | undefined>();
   const [employees, setEmployees] = useState<User[]>([]);
   const [deptFilter, setDeptFilter] = useState("All departments");
+  const [nameQuery, setNameQuery] = useState("");
   const [executiveOnly, setExecutiveOnly] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "pending">("all");
   const [log, setLog] = useState<EmailLogEntry[]>([]);
@@ -42,14 +43,16 @@ export default function CompanyPage() {
   }
 
   const filtered = useMemo(() => {
+    const query = nameQuery.trim().toLowerCase();
     return employees.filter((e) => {
+      if (query && !e.name.toLowerCase().includes(query)) return false;
       if (deptFilter !== "All departments" && e.department !== deptFilter) return false;
       if (executiveOnly && !e.result?.archetype.executiveFit) return false;
       if (statusFilter === "completed" && !e.result) return false;
       if (statusFilter === "pending" && e.result) return false;
       return true;
     });
-  }, [employees, deptFilter, executiveOnly, statusFilter]);
+  }, [employees, nameQuery, deptFilter, executiveOnly, statusFilter]);
 
   const stats = useMemo(() => {
     const completed = employees.filter((e) => e.result).length;
@@ -136,6 +139,14 @@ export default function CompanyPage() {
             <input type="checkbox" checked={executiveOnly} onChange={(e) => setExecutiveOnly(e.target.checked)} />
             Executive-fit archetypes only
           </label>
+
+          <input
+            type="text"
+            value={nameQuery}
+            onChange={(e) => setNameQuery(e.target.value)}
+            placeholder="Search employee name…"
+            className="rounded-md bg-ink-800 border border-hairline/10 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-brass outline-none"
+          />
         </div>
         <p className="text-xs text-slate-500 -mt-3 mb-5">
           "Export CSV" downloads the {filtered.length} employee{filtered.length === 1 ? "" : "s"} matching the filters above.

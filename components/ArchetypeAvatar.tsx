@@ -2,10 +2,12 @@ import Image from "next/image";
 import { Archetype } from "@/lib/types";
 import { GROUP_META } from "@/lib/groups";
 
+// Wrapper shrinks on narrow screens (full size only from `sm:` up) so the
+// avatar never crowds out the text sitting next to it on a phone.
 const SIZES = {
-  sm: { wrap: "h-[72px] w-[72px]", icon: 52 },
-  md: { wrap: "h-28 w-28", icon: 84 },
-  lg: { wrap: "h-40 w-40", icon: 124 },
+  sm: { wrap: "h-12 w-12 sm:h-[72px] sm:w-[72px] p-2", icon: 72 },
+  md: { wrap: "h-16 w-16 sm:h-28 sm:w-28 p-2.5", icon: 112 },
+  lg: { wrap: "h-20 w-20 sm:h-40 sm:w-40 p-3", icon: 160 },
 } as const;
 
 export default function ArchetypeAvatar({
@@ -25,7 +27,14 @@ export default function ArchetypeAvatar({
       aria-label={`${archetype.name} (${archetype.group}) mascot`}
       title={`${archetype.name} — ${archetype.group}`}
     >
-      <Image src={archetype.icon} alt="" width={icon} height={icon} unoptimized />
+      <Image
+        src={archetype.icon}
+        alt=""
+        width={icon}
+        height={icon}
+        unoptimized
+        className="h-full w-full object-contain"
+      />
     </span>
   );
 }
