@@ -158,7 +158,7 @@ export default function CompanyPage() {
                       <p className="text-slate-50">{emp.name}</p>
                       <p className="text-xs text-slate-500">{emp.email}</p>
                     </td>
-                    <td className="px-5 py-4 text-slate-300">{emp.department}</td>
+                    <td className="px-5 py-4 text-slate-300 [html.light_&]:text-black">{emp.department}</td>
                     <td className="px-5 py-4">
                       {emp.result ? (
                         <div className="flex items-center gap-2">
