@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { findByUsername, setSession, ensureSeeded } from "@/lib/store";
+import { findByUsername, setSession, ensureSeeded, resetAllMockData } from "@/lib/store";
 import { Department } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -15,9 +15,8 @@ const DEPARTMENTS: Department[] = [
   "IT Support",
   "Human Resources",
   "Engineering Manager",
-  "Product Owner",
   "Chief Technology Officer",
-  "Risk/Compliance Officer",
+  "Chief Executive Officer",
 ];
 
 export default function LoginPage() {
@@ -28,10 +27,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState<Department>("Retail Banking");
   const [error, setError] = useState<string | null>(null);
+  const [resetDone, setResetDone] = useState(false);
+
+  function handleResetDemoData() {
+    resetAllMockData();
+    setUsername("");
+    setPassword("");
+    setError(null);
+    setResetDone(true);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setResetDone(false);
 
     const user = findByUsername(username.trim());
     if (!user || user.password !== password) {
@@ -47,7 +56,7 @@ export default function LoginPage() {
 
     // Routing rule:
     // Normal employee departments -> Flow 1 (assess -> result -> dashboard)
-    // HR / Engineering Manager / Product Owner / CTO / Risk-Compliance -> Flow 2 (company oversight)
+    // HR / Engineering Manager / CTO / CEO -> Flow 2 (company oversight)
     if (user.isHrFlow) {
       router.push("/company");
     } else if (user.result) {
@@ -135,7 +144,25 @@ export default function LoginPage() {
 
         <div className="mt-6 text-xs text-slate-600 text-center leading-relaxed">
           Demo accounts — employee: <span className="text-slate-400">aran.suksawat / password123 / Retail Banking</span><br />
-          HR Executive: <span className="text-slate-400">hr.suda / hrpass123 / Human Resources</span>
+          HR Executive: <span className="text-slate-400">hr.suda / hrpass123 / Human Resources</span><br />
+          CEO: <span className="text-slate-400">ceo.malee / hrpass123 / Chief Executive Officer</span><br />
+          CTO: <span className="text-slate-400">cto.peter / hrpass123 / Chief Technology Officer</span><br />
+          Engineering Manager: <span className="text-slate-400">em.nan / hrpass123 / Engineering Manager</span>
+        </div>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={handleResetDemoData}
+            className="text-xs text-slate-500 underline hover:text-brass transition-colors"
+          >
+            Reset demo data
+          </button>
+          {resetDone && (
+            <p className="text-xs text-signal-green mt-1">
+              Demo data reset — the accounts above are ready to use.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store";
-import { User, EmailLogEntry } from "@/lib/types";
+import { User, EmailLogEntry, BUSINESS_DEPARTMENTS, getViewableDepartments } from "@/lib/types";
 import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
 import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
 import { getArchetype } from "@/lib/mbti";
@@ -11,11 +11,6 @@ import TopBar from "@/components/TopBar";
 import ArchetypeBadge from "@/components/ArchetypeBadge";
 import ArchetypeAvatar from "@/components/ArchetypeAvatar";
 import EmployeeDetailModal from "@/components/EmployeeDetailModal";
-
-const DEPT_FILTERS = [
-  "All departments", "Retail Banking", "Corporate Banking", "Customer Service",
-  "Finance & Accounting", "IT Support",
-];
 
 export default function CompanyPage() {
   const router = useRouter();
@@ -43,9 +38,23 @@ export default function CompanyPage() {
     setLog(getEmailLog());
   }
 
+  // Departments this signed-in role is permitted to see: HR/CEO see everything,
+  // CTO is scoped to IT Support, Engineering Manager to the non-IT business departments.
+  const scope = useMemo(() => (me ? getViewableDepartments(me.department) : "all"), [me]);
+
+  const scopedEmployees = useMemo(() => {
+    if (scope === "all") return employees;
+    return employees.filter((e) => scope.includes(e.department));
+  }, [employees, scope]);
+
+  const deptOptions = useMemo(() => {
+    const depts = scope === "all" ? BUSINESS_DEPARTMENTS : scope;
+    return ["All departments", ...depts];
+  }, [scope]);
+
   const filtered = useMemo(() => {
     const query = nameQuery.trim().toLowerCase();
-    return employees.filter((e) => {
+    return scopedEmployees.filter((e) => {
       if (query && !e.name.toLowerCase().includes(query)) return false;
       if (deptFilter !== "All departments" && e.department !== deptFilter) return false;
       if (executiveOnly && !(e.result && getArchetype(e.result.mbtiType).executiveFit)) return false;
@@ -53,13 +62,13 @@ export default function CompanyPage() {
       if (statusFilter === "pending" && e.result) return false;
       return true;
     });
-  }, [employees, nameQuery, deptFilter, executiveOnly, statusFilter]);
+  }, [scopedEmployees, nameQuery, deptFilter, executiveOnly, statusFilter]);
 
   const stats = useMemo(() => {
-    const completed = employees.filter((e) => e.result).length;
-    const executiveFit = employees.filter((e) => e.result && getArchetype(e.result.mbtiType).executiveFit).length;
-    return { total: employees.length, completed, pending: employees.length - completed, executiveFit };
-  }, [employees]);
+    const completed = scopedEmployees.filter((e) => e.result).length;
+    const executiveFit = scopedEmployees.filter((e) => e.result && getArchetype(e.result.mbtiType).executiveFit).length;
+    return { total: scopedEmployees.length, completed, pending: scopedEmployees.length - completed, executiveFit };
+  }, [scopedEmployees]);
 
   function handleExportCsv() {
     const csv = buildEmployeeCsv(filtered);
@@ -101,6 +110,10 @@ export default function CompanyPage() {
               Review decision-making personality and style across candidates for upper-management roles, and follow up
               with employees directly.
             </p>
+            <p className="text-xs text-slate-500 mt-2">
+              Viewing as <span className="text-slate-300">{me.department}</span> ·{" "}
+              {scope === "all" ? "all departments" : scope.join(", ")}
+            </p>
           </div>
           <button
             onClick={handleExportCsv}
@@ -123,7 +136,7 @@ export default function CompanyPage() {
             onChange={(e) => setDeptFilter(e.target.value)}
             className="rounded-md bg-ink-800 border border-hairline/10 px-3 py-2 text-sm text-slate-50 focus:border-brass outline-none"
           >
-            {DEPT_FILTERS.map((d) => <option key={d} value={d}>{d}</option>)}
+            {deptOptions.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
 
           <select

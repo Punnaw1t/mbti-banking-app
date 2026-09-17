@@ -15,9 +15,8 @@ const DEPARTMENTS: Department[] = [
   "IT Support",
   "Human Resources",
   "Engineering Manager",
-  "Product Owner",
   "Chief Technology Officer",
-  "Risk/Compliance Officer",
+  "Chief Executive Officer",
 ];
 
 export default function RegisterPage() {

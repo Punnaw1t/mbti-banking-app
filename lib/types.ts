@@ -12,21 +12,39 @@ export type Department =
   | "IT Support"
   | "Human Resources"
   | "Engineering Manager"
-  | "Product Owner"
   | "Chief Technology Officer"
-  | "Risk/Compliance Officer";
+  | "Chief Executive Officer";
 
 // Departments that are routed to Flow 2 (company-wide MBTI oversight / recruitment support)
 export const HR_ACCESS_DEPARTMENTS: Department[] = [
   "Human Resources",
   "Engineering Manager",
-  "Product Owner",
   "Chief Technology Officer",
-  "Risk/Compliance Officer",
+  "Chief Executive Officer",
 ];
 
 export function hasHrAccess(dept: Department): boolean {
   return HR_ACCESS_DEPARTMENTS.includes(dept);
+}
+
+// Business departments (as opposed to Flow 2 oversight roles) shown in the Company MBTI Overview.
+export const BUSINESS_DEPARTMENTS: Department[] = [
+  "Retail Banking",
+  "Corporate Banking",
+  "Customer Service",
+  "Finance & Accounting",
+  "IT Support",
+];
+
+// Which business departments each Flow 2 role is scoped to see in the Company MBTI Overview.
+// A role not listed here (HR, CEO) has unrestricted visibility across all business departments.
+const ROLE_DEPARTMENT_SCOPE: Partial<Record<Department, Department[]>> = {
+  "Chief Technology Officer": ["IT Support"],
+  "Engineering Manager": ["Retail Banking", "Corporate Banking", "Customer Service", "Finance & Accounting"],
+};
+
+export function getViewableDepartments(role: Department): Department[] | "all" {
+  return ROLE_DEPARTMENT_SCOPE[role] ?? "all";
 }
 
 export interface Scores {

@@ -1,6 +1,6 @@
 # Meridian — MBTI Executive Decision-Support System (DSS)
 
-**Business domain:** Banking Technology Company — This system called "Decision Style Assessment Tool for Banking Tech Leaders", Designed for helping the fintech and banking technology industry. It focuses on Engineering Managers, Product Owners, Chief Technology Officers (CTOs), and Risk/Compliance Officers. These roles are responsible for decisions involving areas such as incident response, sprint prioritization, platform architecture, digital banking systems, and regulatory compliance.
+**Business domain:** Banking Technology Company — This system called "Decision Style Assessment Tool for Banking Tech Leaders", Designed for helping the fintech and banking technology industry. It focuses on Engineering Managers, Chief Technology Officers (CTOs), and CEOs. These roles are responsible for decisions involving areas such as incident response, sprint prioritization, platform architecture, digital banking systems, and company-wide strategy.
 
 **Purpose:** The purpose of the system is to understand how engineering leaders and managers make decisions by assessing their MBTI personality type and mapping the result to one of four Executive Decision Maker Styles.
 
@@ -24,9 +24,16 @@ Register -> Login → Check employee MBTI status (Graph / Dashboard) → Suggest
 ```
 
 **Routing rule at Login** (also enforced at Register):
-- Department = *Human Resources, Engineering Manager, Product Owner,
-  Chief Technology Officer, Risk/Compliance Officer* → **Flow 2**
+- Department = *Human Resources, Engineering Manager, Chief Technology Officer,
+  Chief Executive Officer* → **Flow 2**
 - Any other department → **Flow 1**
+
+**Flow 2 department visibility** — the Company MBTI Overview scopes each role to the
+business departments it's allowed to review:
+- *Human Resources* and *Chief Executive Officer* → all departments
+- *Chief Technology Officer* → IT Support only
+- *Engineering Manager* → Retail Banking, Corporate Banking, Customer Service,
+  Finance & Accounting
 
 ---
 
@@ -225,8 +232,9 @@ npm run dev
 |---|---|---|---|
 | aran.suksawat | password123 | Retail Banking | Flow 1 (has a result) |
 | warut.phetchara | password123 | Retail Banking | Flow 1 (no result yet) |
-| hr.suda | hrpass123 | Human Resources | Flow 2 |
-| cto.peter | hrpass123 | Chief Technology Officer | Flow 2 |
-| risk.malee | hrpass123 | Risk/Compliance Officer | Flow 2 |
+| hr.suda | hrpass123 | Human Resources | Flow 2 (all departments) |
+| ceo.malee | hrpass123 | Chief Executive Officer | Flow 2 (all departments) |
+| cto.peter | hrpass123 | Chief Technology Officer | Flow 2 (IT Support only) |
+| em.nan | hrpass123 | Engineering Manager | Flow 2 (Retail/Corporate Banking, Customer Service, Finance & Accounting) |
 
 All data is mock and stored in the browser's `localStorage` — no backend required.

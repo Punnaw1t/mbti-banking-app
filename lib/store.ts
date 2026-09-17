@@ -118,8 +118,13 @@ function seedHrUsers(): User[] {
       createdAt: new Date().toISOString(),
     },
     {
-      id: "u-2003", name: "Malee Jitpakdee (Risk & Compliance Officer)", username: "risk.malee", password: "hrpass123",
-      email: "malee.jitpakdee@siambankcorp.com", department: "Risk/Compliance Officer", isHrFlow: true,
+      id: "u-2003", name: "Malee Jitpakdee (CEO)", username: "ceo.malee", password: "hrpass123",
+      email: "malee.jitpakdee@siambankcorp.com", department: "Chief Executive Officer", isHrFlow: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "u-2004", name: "Nan Suriyawong (Engineering Manager)", username: "em.nan", password: "hrpass123",
+      email: "nan.suriyawong@siambankcorp.com", department: "Engineering Manager", isHrFlow: true,
       createdAt: new Date().toISOString(),
     },
   ];
@@ -156,9 +161,8 @@ export function createUser(input: {
   const isHrFlow =
     input.department === "Human Resources" ||
     input.department === "Engineering Manager" ||
-    input.department === "Product Owner" ||
     input.department === "Chief Technology Officer" ||
-    input.department === "Risk/Compliance Officer";
+    input.department === "Chief Executive Officer";
 
   const user: User = {
     id: "u-" + Date.now(),
