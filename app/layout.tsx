@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Meridian DSS — Executive Decision-Style Assessment",
   description:
-    "MBTI-based Decision Support System for HR Executive review of upper-management decision styles — Siam Bank Corp.",
+    "OCEAN (Big Five) Decision Support System for HR Executive review of upper-management decision styles — Siam Bank Corp.",
 };
 
 const THEME_INIT_SCRIPT = `

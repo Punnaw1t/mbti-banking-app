@@ -1,6 +1,6 @@
 "use client";
 
-import { Department, EmailLogEntry, User } from "./types";
+import { Department, EmailLogEntry, OceanScores, User } from "./types";
 
 // =========================================================================
 // DATA COMPONENT (DSS)
@@ -12,9 +12,11 @@ import { Department, EmailLogEntry, User } from "./types";
 // diagram: USERS, TEST_RESULTS, DEPARTMENTS, EMAIL_LOG).
 // =========================================================================
 
-const USERS_KEY = "mbti_dss_users";
-const SESSION_KEY = "mbti_dss_session";
-const EMAIL_LOG_KEY = "mbti_dss_email_log";
+// Renamed from mbti_dss_*: MBTI results can't be converted to OCEAN scores, so
+// browsers holding the old data start again from the seed.
+const USERS_KEY = "ocean_dss_users";
+const SESSION_KEY = "ocean_dss_session";
+const EMAIL_LOG_KEY = "ocean_dss_email_log";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -33,67 +35,68 @@ function write<T>(key: string, value: T) {
 }
 
 // --- Seed data: mock banking-org employees for the Flow 2 company view ----
-function seedEmployees(): User[] {
-  const rows: Array<[string, string, Department, string | undefined]> = [
-    ["Aran Suksawat", "aran.suksawat", "Retail Banking", "ISTJ"],
-    ["Nutcha Boonmee", "nutcha.boonmee", "Corporate Banking", "ENTJ"],
-    ["Pim Charoensuk", "pim.charoensuk", "Customer Service", "ESFJ"],
-    ["Somchai Rattanakul", "somchai.rattanakul", "Finance & Accounting", "ISTJ"],
-    ["Kanya Wattana", "kanya.wattana", "IT Support", "ISTP"],
-    ["Nathan Wells", "nathan.wells", "Corporate Banking", "ESTJ"],
-    ["Ploy Sirichai", "ploy.sirichai", "Retail Banking", "ESFP"],
-    ["David Chan", "david.chan", "Finance & Accounting", "INTJ"],
-    ["Warut Phetchara", "warut.phetchara", undefined as unknown as Department, undefined],
-  ];
+// Names are invented. Each scores object is copied from a row of
+// data/employees_ocean_hr.csv; the trailing number is that row's employee_id.
+const SEED_SCORES: Record<string, OceanScores> = {
+  "u-1001": { O: 37, C: 27, E: 21, A: 40, N: 28 }, // 6
+  "u-1002": { O: 49, C: 41, E: 45, A: 40, N: 37 }, // 939
+  "u-1003": { O: 44, C: 36, E: 33, A: 48, N: 26 }, // 68
+  "u-1004": { O: 38, C: 50, E: 42, A: 50, N: 22 }, // 970
+  "u-1005": { O: 48, C: 39, E: 21, A: 30, N: 43 }, // 87
+  "u-1006": { O: 42, C: 37, E: 24, A: 32, N: 40 }, // 3
+  "u-1007": { O: 46, C: 38, E: 42, A: 40, N: 40 }, // 63
+  "u-1008": { O: 49, C: 38, E: 35, A: 30, N: 24 }, // 1746
+};
 
+function seedEmployees(): User[] {
   const employees: User[] = [
     {
       id: "u-1001", name: "Aran Suksawat", username: "aran.suksawat", password: "password123",
       email: "aran.suksawat@siambankcorp.com", department: "Retail Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 2, I: 4, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1001"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1002", name: "Nutcha Boonmee", username: "nutcha.boonmee", password: "password123",
       email: "nutcha.boonmee@siambankcorp.com", department: "Corporate Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 1, N: 5, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "ENTJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1002"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1003", name: "Pim Charoensuk", username: "pim.charoensuk", password: "password123",
       email: "pim.charoensuk@siambankcorp.com", department: "Customer Service", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 4, I: 2, S: 5, N: 1, T: 1, F: 5, J: 4, P: 2 }, mbtiType: "ESFJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1003"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1004", name: "Somchai Rattanakul", username: "somchai.rattanakul", password: "password123",
       email: "somchai.rattanakul@siambankcorp.com", department: "Finance & Accounting", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 6, N: 0, T: 5, F: 1, J: 6, P: 0 }, mbtiType: "ISTJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1004"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1005", name: "Kanya Wattana", username: "kanya.wattana", password: "password123",
       email: "kanya.wattana@siambankcorp.com", department: "IT Support", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 5, N: 1, T: 5, F: 1, J: 1, P: 5 }, mbtiType: "ISTP", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1005"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1006", name: "Nathan Wells", username: "nathan.wells", password: "password123",
       email: "nathan.wells@siambankcorp.com", department: "Corporate Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 6, F: 0, J: 6, P: 0 }, mbtiType: "ESTJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1006"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1007", name: "Ploy Sirichai", username: "ploy.sirichai", password: "password123",
       email: "ploy.sirichai@siambankcorp.com", department: "Retail Banking", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 5, I: 1, S: 5, N: 1, T: 1, F: 5, J: 1, P: 5 }, mbtiType: "ESFP", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1007"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1008", name: "David Chan", username: "david.chan", password: "password123",
       email: "david.chan@siambankcorp.com", department: "Finance & Accounting", isHrFlow: false,
       createdAt: new Date().toISOString(),
-      result: { scores: { E: 1, I: 5, S: 0, N: 6, T: 6, F: 0, J: 5, P: 1 }, mbtiType: "INTJ", completedAt: new Date().toISOString() },
+      result: { scores: SEED_SCORES["u-1008"], completedAt: new Date().toISOString() },
     },
     {
       id: "u-1009", name: "Warut Phetchara", username: "warut.phetchara", password: "password123",

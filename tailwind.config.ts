@@ -37,13 +37,6 @@ const config: Config = {
           red: "#C0564B",
           amber: "#C89B3C",
         },
-        // The 4 major MBTI colour groups — fixed across themes.
-        group: {
-          analyst: "#9B7FD4",
-          diplomat: "#4FAE7C",
-          sentinel: "#5B93D6",
-          explorer: "#E3A83A",
-        },
       },
       fontFamily: {
         // Self-hosted-free stacks (no external font fetch required at build time).

@@ -1,10 +1,9 @@
 "use client";
 
 import { TestResult, User } from "@/lib/types";
-import { dichotomyPercents, getArchetype } from "@/lib/mbti";
-import { GROUP_META } from "@/lib/groups";
-import ArchetypeAvatar from "./ArchetypeAvatar";
-import ArchetypeBadge from "./ArchetypeBadge";
+import { getProfile, isExecutiveFit, leadershipIndex } from "@/lib/ocean";
+import OceanPanel from "./OceanPanel";
+import ProfileBadge from "./ProfileBadge";
 
 export default function EmployeeDetailModal({
   employee,
@@ -43,7 +42,7 @@ export default function EmployeeDetailModal({
 
         {!result ? (
           <p className="text-sm text-slate-300 [html.light_&]:text-black">
-            This employee hasn't completed the MBTI decision-style assessment yet.
+            This employee hasn't completed the OCEAN personality assessment yet.
           </p>
         ) : (
           <EmployeeResultDetail result={result} />
@@ -54,75 +53,45 @@ export default function EmployeeDetailModal({
 }
 
 function EmployeeResultDetail({ result }: { result: TestResult }) {
-  const archetype = getArchetype(result.mbtiType);
-  const pct = dichotomyPercents(result.scores);
-  const rows = [
-    { key: "EI", ...pct.EI, leftName: "Extraversion", rightName: "Introversion" },
-    { key: "SN", ...pct.SN, leftName: "Sensing", rightName: "Intuition" },
-    { key: "TF", ...pct.TF, leftName: "Thinking", rightName: "Feeling" },
-    { key: "JP", ...pct.JP, leftName: "Judging", rightName: "Perceiving" },
-  ] as const;
+  const { scores } = result;
+  const profile = getProfile(scores);
 
   return (
     <>
-      <div className="flex items-center gap-4 mb-6">
-        <ArchetypeAvatar archetype={archetype} size="lg" />
-        <div>
-          <p className="font-display text-2xl text-slate-50">
-            {result.mbtiType} — {archetype.name}
-          </p>
-          <ArchetypeBadge archetype={archetype} />
-        </div>
+      <div className="mb-4">
+        <p className="font-display text-2xl text-slate-50 mb-2">{profile.name}</p>
+        <ProfileBadge scores={scores} />
       </div>
 
       <p className="text-sm text-slate-300 [html.light_&]:text-black leading-relaxed mb-6">
-        {archetype.description}
+        {profile.description}
       </p>
 
       <div className="grid sm:grid-cols-2 gap-6 mb-6 pb-6 border-b border-hairline/10">
         <div>
           <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Decision style summary</p>
-          <p className="text-sm text-slate-200">{archetype.decisionStyle}</p>
+          <p className="text-sm text-slate-200">{profile.decisionStyle}</p>
           <p className="text-sm text-slate-300 [html.light_&]:text-black mt-1">
-            {archetype.decisionStyleDetail}
+            {profile.decisionStyleDetail}
           </p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">MBTI colour group</p>
-          <p className={`text-sm font-medium ${GROUP_META[archetype.group].text}`}>
-            {archetype.group}s
+          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Leadership index</p>
+          <p className="font-display text-2xl text-slate-50">{leadershipIndex(scores)}</p>
+          <p className="text-sm text-slate-300 [html.light_&]:text-black mt-1">
+            OCEAN percentiles weighted by their link to leadership. 70 or above is executive-track.
           </p>
-          <p className="text-sm text-slate-200 mt-1">{GROUP_META[archetype.group].blurb}</p>
         </div>
       </div>
 
-      <p className="text-xs uppercase tracking-widest text-slate-400 mb-4">Dichotomy breakdown</p>
-      <div className="space-y-5 mb-6">
-        {rows.map((r) => (
-          <div key={r.key}>
-            <div className="flex justify-between text-sm mb-1.5">
-              <span className="text-slate-300 [html.light_&]:text-black">
-                {r.leftName} ({r.leftLabel})
-              </span>
-              <span className="text-slate-300 [html.light_&]:text-black">
-                {r.rightName} ({r.rightLabel})
-              </span>
-            </div>
-            <div className="h-2 rounded-full bg-hairline/10 overflow-hidden flex">
-              <div className="h-full bg-brass" style={{ width: `${r.leftPct}%` }} />
-              <div className="h-full bg-slate-400/40" style={{ width: `${100 - r.leftPct}%` }} />
-            </div>
-            <div className="flex justify-between text-xs text-slate-500 mt-1">
-              <span>{r.leftPct}%</span>
-              <span>{100 - r.leftPct}%</span>
-            </div>
-          </div>
-        ))}
+      <p className="text-xs uppercase tracking-widest text-slate-400 mb-4">OCEAN profile</p>
+      <div className="mb-6">
+        <OceanPanel scores={scores} />
       </div>
 
-      {archetype.executiveFit && (
+      {isExecutiveFit(scores) && (
         <p className="text-xs text-brass-light border-t border-hairline/10 pt-3 mb-2">
-          Flagged as a core executive-track decision style for upper-management review.
+          Flagged as a core executive-track profile for upper-management review.
         </p>
       )}
 

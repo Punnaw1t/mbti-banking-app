@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation";
 import { getSessionUser } from "@/lib/store";
 import { User } from "@/lib/types";
 import TopBar from "@/components/TopBar";
-import ArchetypeBadge from "@/components/ArchetypeBadge";
-import ArchetypeAvatar from "@/components/ArchetypeAvatar";
-import { GROUP_META } from "@/lib/groups";
-import { dichotomyPercents, getArchetype } from "@/lib/mbti";
+import OceanPanel from "@/components/OceanPanel";
+import ProfileBadge from "@/components/ProfileBadge";
+import { getProfile } from "@/lib/ocean";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,7 +17,7 @@ export default function DashboardPage() {
     const u = getSessionUser();
     if (!u) { router.replace("/login"); return; }
     if (u.isHrFlow) { router.replace("/company"); return; }
-    if (!u.result) { router.replace("/mbti-test"); return; }
+    if (!u.result) { router.replace("/assessment"); return; }
     setUser(u);
   }, [router]);
 
@@ -26,9 +25,8 @@ export default function DashboardPage() {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-slate-400 text-sm">Loading dashboard…</p></div>;
   }
 
-  const { mbtiType, completedAt } = user.result;
-  const archetype = getArchetype(mbtiType);
-  const pct = dichotomyPercents(user.result.scores);
+  const { scores, completedAt } = user.result;
+  const profile = getProfile(scores);
 
   return (
     <div className="min-h-screen">
@@ -41,7 +39,7 @@ export default function DashboardPage() {
             <p className="text-slate-400 text-sm mt-1">{user.department} · Siam Bank Corp</p>
           </div>
           <button
-            onClick={() => router.push("/mbti-test")}
+            onClick={() => router.push("/assessment")}
             className="text-sm text-slate-300 border border-hairline/15 rounded-md px-4 py-2 hover:border-brass hover:text-brass transition-colors self-start"
           >
             Retake assessment
@@ -50,56 +48,23 @@ export default function DashboardPage() {
 
         <div className="grid md:grid-cols-3 gap-5">
           <div className="md:col-span-1 bg-ink-800 border border-brass/30 rounded-lg p-6">
-            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Your type</p>
-            <div className="flex items-center gap-3 mb-3">
-              <ArchetypeAvatar archetype={archetype} />
-              <p className="font-display text-4xl text-slate-50">{mbtiType}</p>
+            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Your decision profile</p>
+            <p className="font-display text-3xl text-slate-50 mb-3">{profile.name}</p>
+            <ProfileBadge scores={scores} />
+            <p className="text-sm text-slate-300 [html.light_&]:text-black mt-4 leading-relaxed">{profile.description}</p>
+            <div className="mt-5 pt-5 border-t border-hairline/10">
+              <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Decision style summary</p>
+              <p className="text-sm text-slate-200">{profile.decisionStyle}</p>
+              <p className="text-sm text-slate-300 [html.light_&]:text-black mt-1">{profile.decisionStyleDetail}</p>
             </div>
-            <ArchetypeBadge archetype={archetype} />
-            <p className="text-sm text-slate-300 [html.light_&]:text-black mt-4 leading-relaxed">{archetype.description}</p>
             <p className="text-xs text-slate-500 mt-4">
               Assessed on {new Date(completedAt).toLocaleDateString()}
             </p>
           </div>
 
           <div className="md:col-span-2 bg-ink-800 border border-hairline/10 rounded-lg p-6">
-            <p className="text-xs uppercase tracking-widest text-slate-400 mb-5">Dichotomy breakdown</p>
-            <div className="space-y-5">
-              {([
-                { key: "EI", ...pct.EI, leftName: "Extraversion", rightName: "Introversion" },
-                { key: "SN", ...pct.SN, leftName: "Sensing", rightName: "Intuition" },
-                { key: "TF", ...pct.TF, leftName: "Thinking", rightName: "Feeling" },
-                { key: "JP", ...pct.JP, leftName: "Judging", rightName: "Perceiving" },
-              ] as const).map((r) => (
-                <div key={r.key}>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="text-slate-300 [html.light_&]:text-black">{r.leftName}</span>
-                    <span className="text-slate-300 [html.light_&]:text-black">{r.rightName}</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-hairline/10 overflow-hidden flex">
-                    <div className="h-full bg-brass" style={{ width: `${r.leftPct}%` }} />
-                    <div className="h-full bg-slate-400/40" style={{ width: `${100 - r.leftPct}%` }} />
-                  </div>
-                  <div className="flex justify-between text-xs text-slate-500 mt-1">
-                    <span>{r.leftPct}%</span>
-                    <span>{100 - r.leftPct}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-7 pt-6 border-t border-hairline/10 grid sm:grid-cols-2 gap-6">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Decision style summary</p>
-                <p className="text-sm text-slate-200">{archetype.decisionStyle}</p>
-                <p className="text-sm text-slate-300 [html.light_&]:text-black mt-1">{archetype.decisionStyleDetail}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">MBTI colour group</p>
-                <p className={`text-sm font-medium ${GROUP_META[archetype.group].text}`}>{archetype.group}s</p>
-                <p className="text-sm text-slate-200 mt-1">{GROUP_META[archetype.group].blurb}</p>
-              </div>
-            </div>
+            <p className="text-xs uppercase tracking-widest text-slate-400 mb-4">OCEAN profile</p>
+            <OceanPanel scores={scores} />
           </div>
         </div>
 

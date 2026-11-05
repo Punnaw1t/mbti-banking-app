@@ -62,7 +62,7 @@ export default function LoginPage() {
     } else if (user.result) {
       router.push("/dashboard");
     } else {
-      router.push("/mbti-test");
+      router.push("/assessment");
     }
   }
 

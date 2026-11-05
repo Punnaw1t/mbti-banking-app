@@ -6,10 +6,10 @@ import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store"
 import { User, EmailLogEntry, BUSINESS_DEPARTMENTS, getViewableDepartments } from "@/lib/types";
 import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
 import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
-import { getArchetype } from "@/lib/mbti";
+import { isExecutiveFit, percentiles } from "@/lib/ocean";
 import TopBar from "@/components/TopBar";
-import ArchetypeBadge from "@/components/ArchetypeBadge";
-import ArchetypeAvatar from "@/components/ArchetypeAvatar";
+import { OceanRadarMini } from "@/components/OceanRadar";
+import ProfileBadge from "@/components/ProfileBadge";
 import EmployeeDetailModal from "@/components/EmployeeDetailModal";
 
 export default function CompanyPage() {
@@ -57,7 +57,7 @@ export default function CompanyPage() {
     return scopedEmployees.filter((e) => {
       if (query && !e.name.toLowerCase().includes(query)) return false;
       if (deptFilter !== "All departments" && e.department !== deptFilter) return false;
-      if (executiveOnly && !(e.result && getArchetype(e.result.mbtiType).executiveFit)) return false;
+      if (executiveOnly && !(e.result && isExecutiveFit(e.result.scores))) return false;
       if (statusFilter === "completed" && !e.result) return false;
       if (statusFilter === "pending" && e.result) return false;
       return true;
@@ -66,7 +66,7 @@ export default function CompanyPage() {
 
   const stats = useMemo(() => {
     const completed = scopedEmployees.filter((e) => e.result).length;
-    const executiveFit = scopedEmployees.filter((e) => e.result && getArchetype(e.result.mbtiType).executiveFit).length;
+    const executiveFit = scopedEmployees.filter((e) => e.result && isExecutiveFit(e.result.scores)).length;
     return { total: scopedEmployees.length, completed, pending: scopedEmployees.length - completed, executiveFit };
   }, [scopedEmployees]);
 
@@ -105,7 +105,7 @@ export default function CompanyPage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-xs uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
-            <h1 className="font-display text-3xl text-slate-50">Company MBTI Overview</h1>
+            <h1 className="font-display text-3xl text-slate-50">Company OCEAN Overview</h1>
             <p className="text-slate-400 text-sm mt-1">
               Review decision-making personality and style across candidates for upper-management roles, and follow up
               with employees directly.
@@ -127,7 +127,7 @@ export default function CompanyPage() {
           <StatCard label="Employees" value={stats.total} />
           <StatCard label="Assessed" value={stats.completed} />
           <StatCard label="Pending" value={stats.pending} accent="amber" />
-          <StatCard label="Executive-fit types" value={stats.executiveFit} accent="brass" />
+          <StatCard label="Executive-fit profiles" value={stats.executiveFit} accent="brass" />
         </div>
 
         <div className="flex flex-wrap gap-3 mb-5">
@@ -151,7 +151,7 @@ export default function CompanyPage() {
 
           <label className="flex items-center gap-2 rounded-md bg-ink-800 border border-hairline/10 px-3 py-2 text-sm text-slate-200 cursor-pointer">
             <input type="checkbox" checked={executiveOnly} onChange={(e) => setExecutiveOnly(e.target.checked)} />
-            Executive-fit archetypes only
+            Executive-fit profiles only
           </label>
 
           <input
@@ -173,15 +173,13 @@ export default function CompanyPage() {
                 <tr className="text-left text-slate-400 border-b border-hairline/10">
                   <th className="px-5 py-3 font-normal">Employee</th>
                   <th className="px-5 py-3 font-normal">Department</th>
-                  <th className="px-5 py-3 font-normal">MBTI &amp; archetype</th>
+                  <th className="px-5 py-3 font-normal">OCEAN profile</th>
                   <th className="px-5 py-3 font-normal">Status</th>
                   <th className="px-5 py-3 font-normal text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((emp) => {
-                  const archetype = emp.result ? getArchetype(emp.result.mbtiType) : undefined;
-                  return (
+                {filtered.map((emp) => (
                   <tr
                     key={emp.id}
                     onClick={() => setViewing(emp)}
@@ -193,10 +191,10 @@ export default function CompanyPage() {
                     </td>
                     <td className="px-5 py-4 text-slate-300 [html.light_&]:text-black">{emp.department}</td>
                     <td className="px-5 py-4">
-                      {archetype ? (
+                      {emp.result ? (
                         <div className="flex items-center gap-2">
-                          <ArchetypeAvatar archetype={archetype} size="sm" />
-                          <ArchetypeBadge archetype={archetype} size="sm" />
+                          <OceanRadarMini percentiles={percentiles(emp.result.scores)} />
+                          <ProfileBadge scores={emp.result.scores} size="sm" />
                         </div>
                       ) : (
                         <span className="text-slate-600 text-xs">Not assessed</span>
@@ -213,8 +211,7 @@ export default function CompanyPage() {
                       <FollowUpLink employee={emp} fromName={me.name} onClick={() => handleFollowUpClick(emp)} />
                     </td>
                   </tr>
-                  );
-                })}
+                ))}
                 {filtered.length === 0 && (
                   <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-500 text-sm">No employees match these filters.</td></tr>
                 )}

@@ -1,8 +1,6 @@
-// Core domain types for the MBTI Executive Decision-Support System (DSS)
+// Core domain types for the OCEAN Executive Decision-Support System (DSS)
 // Domain: Banking Company — HR Executive support tool for
 // upper-management recruitment & internal talent decision-style mapping.
-
-export type Trait = "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P";
 
 export type Department =
   | "Retail Banking"
@@ -15,7 +13,7 @@ export type Department =
   | "Chief Technology Officer"
   | "Chief Executive Officer";
 
-// Departments that are routed to Flow 2 (company-wide MBTI oversight / recruitment support)
+// Departments that are routed to Flow 2 (company-wide OCEAN oversight / recruitment support)
 export const HR_ACCESS_DEPARTMENTS: Department[] = [
   "Human Resources",
   "Engineering Manager",
@@ -27,7 +25,7 @@ export function hasHrAccess(dept: Department): boolean {
   return HR_ACCESS_DEPARTMENTS.includes(dept);
 }
 
-// Business departments (as opposed to Flow 2 oversight roles) shown in the Company MBTI Overview.
+// Business departments (as opposed to Flow 2 oversight roles) shown in the Company OCEAN Overview.
 export const BUSINESS_DEPARTMENTS: Department[] = [
   "Retail Banking",
   "Corporate Banking",
@@ -36,7 +34,7 @@ export const BUSINESS_DEPARTMENTS: Department[] = [
   "IT Support",
 ];
 
-// Which business departments each Flow 2 role is scoped to see in the Company MBTI Overview.
+// Which business departments each Flow 2 role is scoped to see in the Company OCEAN Overview.
 // A role not listed here (HR, CEO) has unrestricted visibility across all business departments.
 const ROLE_DEPARTMENT_SCOPE: Partial<Record<Department, Department[]>> = {
   "Chief Technology Officer": ["IT Support"],
@@ -47,52 +45,38 @@ export function getViewableDepartments(role: Department): Department[] | "all" {
   return ROLE_DEPARTMENT_SCOPE[role] ?? "all";
 }
 
-export interface Scores {
-  E: number;
-  I: number;
-  S: number;
-  N: number;
-  T: number;
-  F: number;
-  J: number;
-  P: number;
-}
+export type OceanTrait = "O" | "C" | "E" | "A" | "N";
+
+// Raw trait totals: 10 items each on a 1–5 scale, so every value is 10–50.
+export type OceanScores = Record<OceanTrait, number>;
+
+// 1 = Disagree, 3 = Neutral, 5 = Agree — the IPIP-50 response scale.
+export type LikertAnswer = 1 | 2 | 3 | 4 | 5;
 
 export interface Question {
   id: number;
-  // Which dichotomy this placeholder question measures
-  dichotomy: "EI" | "SN" | "TF" | "JP";
+  trait: OceanTrait;
   prompt: string;
-  optionA: { label: string; trait: Trait };
-  optionB: { label: string; trait: Trait };
+  reverse: boolean; // scored as 6 - answer
 }
 
-export type MbtiCode =
-  | "ISTJ" | "ISFJ" | "INFJ" | "INTJ"
-  | "ISTP" | "ISFP" | "INFP" | "INTP"
-  | "ESTP" | "ESFP" | "ENFP" | "ENTP"
-  | "ESTJ" | "ESFJ" | "ENFJ" | "ENTJ";
+// E, C, O and A are the trait itself; S is low Neuroticism (emotional
+// stability); B is the balanced profile, where no trait stands out.
+export type ProfileCode = "E" | "C" | "S" | "O" | "A" | "B";
 
-export type MbtiGroup = "Analyst" | "Diplomat" | "Sentinel" | "Explorer";
-
-export interface Archetype {
-  code: MbtiCode;
-  name: string;          // e.g. "Commander"
-  group: MbtiGroup;
+export interface DecisionProfile {
+  code: ProfileCode;
+  name: string;                // e.g. "The Steward"
   decisionStyle: string;       // short label used on dashboards
   decisionStyleDetail: string; // one sentence elaborating on the label
   description: string;
-  executiveFit: boolean; // highlighted as a core upper-management archetype
-  icon: string;          // path to the archetype's SVG icon (public/mbti-icons/*.svg)
 }
 
 export interface TestResult {
-  scores: Scores;
-  mbtiType: MbtiCode;
-  // Archetype is intentionally NOT stored here — it's derived live from
-  // mbtiType via getArchetype() everywhere it's needed. Storing a snapshot
-  // would go stale whenever archetypeRules changes (e.g. a new icon), even
-  // for results that were saved long before the change.
+  scores: OceanScores;
+  // Percentiles, the decision profile and executive fit are intentionally NOT
+  // stored here — they're derived live from scores via lib/ocean.ts. Storing a
+  // snapshot would go stale whenever the norms or rules change.
   completedAt: string;
 }
 

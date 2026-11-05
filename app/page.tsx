@@ -18,7 +18,7 @@ export default function Home() {
     } else if (user.result) {
       router.replace("/dashboard");
     } else {
-      router.replace("/mbti-test");
+      router.replace("/assessment");
     }
   }, [router]);
 

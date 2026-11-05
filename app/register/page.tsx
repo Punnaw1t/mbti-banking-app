@@ -44,12 +44,12 @@ export default function RegisterPage() {
     const user = createUser({ name: name.trim(), username: username.trim(), password, email: email.trim(), department });
     setSession(user.id);
 
-    // Flow 1: register -> login (implicit) -> do MBTI test -> result -> dashboard
+    // Flow 1: register -> login (implicit) -> do OCEAN assessment -> result -> dashboard
     // Flow 2 accounts created here still go straight into oversight, matching the login rule.
     if (user.isHrFlow) {
       router.push("/company");
     } else {
-      router.push("/mbti-test");
+      router.push("/assessment");
     }
   }
 

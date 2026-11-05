@@ -1,6 +1,7 @@
-import { Archetype } from "@/lib/types";
+import { OceanScores } from "@/lib/types";
+import { getProfile, isExecutiveFit } from "@/lib/ocean";
 
-export default function ArchetypeBadge({ archetype, size = "md" }: { archetype: Archetype; size?: "sm" | "md" | "lg" }) {
+export default function ProfileBadge({ scores, size = "md" }: { scores: OceanScores; size?: "sm" | "md" | "lg" }) {
   const sizes = {
     sm: "text-xs px-2 py-0.5",
     md: "text-sm px-3 py-1",
@@ -10,14 +11,12 @@ export default function ArchetypeBadge({ archetype, size = "md" }: { archetype: 
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border ${sizes} ${
-        archetype.executiveFit
+        isExecutiveFit(scores)
           ? "border-brass/60 bg-brass/10 text-brass-light"
           : "border-slate-400/30 bg-hairline/5 text-slate-200"
       }`}
     >
-      <span className="font-medium">{archetype.code}</span>
-      <span className="opacity-70">·</span>
-      <span>{archetype.name}</span>
+      {getProfile(scores).name}
     </span>
   );
 }
