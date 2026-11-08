@@ -159,8 +159,8 @@ def load_hr(raw: Path, report: dict):
     report["hr_rows"] = {"train": len(train), "test": len(test), "employee_performance": len(kpi)}
 
     # The performance file is a test.csv subset carrying one extra column. It has
-    # 3 surplus rows; two conflict with test.csv, which is why only employee_id
-    # and the KPI flag are taken from it.
+    # 3 surplus rows: two exact duplicates, and one that contradicts test.csv,
+    # which is why only employee_id and the KPI flag are taken from it.
     kpi = kpi[["employee_id", "KPIs_met_more_than_80"]].drop_duplicates("employee_id")
     hr = test.merge(kpi, on="employee_id", how="inner", validate="one_to_one")
     hr["education_filled"] = hr["education"].map(EDUCATION).fillna("Unknown")

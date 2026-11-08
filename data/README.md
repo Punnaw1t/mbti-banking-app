@@ -46,12 +46,12 @@ a KPI flag and a promotion outcome. That is why promotion is modelled, not joine
    straight-lining. 592,204 remain. Cronbach's α is .80–.90 per trait.
 2. **Norms.** Percentiles come from those 592,204 people. They are a global online
    sample, not Thai bankers.
-3. **Clean HR.** Drop 3 surplus rows from the performance file. Two of them conflict
-   with `test.csv`, which is treated as correct. Standardise education; blanks become
+3. **Clean HR.** Drop 3 surplus rows from the performance file: two are exact
+   duplicates, and one contradicts `test.csv`, which is treated as correct. Standardise education; blanks become
    `Unknown`.
 4. **Performance axis.** Weighted mean of rating (50%), KPI (40%) and awards (10%),
-   as a percentile. The 1,363 first-year employees have no rating, so they are `Not
-   rated` and get no 9-box placement.
+   as a percentile. 1,363 employees, all in their first year, have no rating, so they
+   are `Not rated` and get no 9-box placement.
 5. **Potential axis.** A logistic regression trained on `train.csv` predicts promotion
    from peer-relative training score, trainings attended, age, tenure, education and
    recruitment channel. Performance inputs are left out so the two axes stay distinct
