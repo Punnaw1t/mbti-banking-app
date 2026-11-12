@@ -1,12 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { clearSession } from "@/lib/store";
 import { User } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   function handleSignOut() {
     clearSession();
@@ -22,13 +24,21 @@ export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
             {tag ?? "Executive Decision-Style DSS"}
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {user && (
             <>
               <div className="text-right leading-tight hidden sm:block">
                 <p className="text-sm text-slate-50">{user.name}</p>
                 <p className="text-xs text-slate-400">{user.department}</p>
               </div>
+              {pathname !== "/account" && (
+                <Link
+                  href="/account"
+                  className="text-sm px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
+                >
+                  Account
+                </Link>
+              )}
               <button
                 onClick={handleSignOut}
                 className="text-sm px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"

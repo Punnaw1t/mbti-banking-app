@@ -55,7 +55,11 @@ const LEADERSHIP_WEIGHTS: Record<OceanTrait, number> = { E: 0.31, C: 0.28, N: -0
 const EXECUTIVE_FIT_THRESHOLD = 70; // roughly the top 15% of the workforce
 
 export function leadershipIndex(s: OceanScores): number {
-  const p = percentiles(s);
+  return leadershipIndexFromPercentiles(percentiles(s));
+}
+
+// Same index from percentiles directly, e.g. a scenario typed into the HR chatbot.
+export function leadershipIndexFromPercentiles(p: OceanScores): number {
   let weighted = 0;
   let total = 0;
   TRAIT_ORDER.forEach((t) => {
@@ -78,6 +82,8 @@ export function leadershipIndex(s: OceanScores): number {
 export function isExecutiveFit(s: OceanScores): boolean {
   return leadershipIndex(s) >= EXECUTIVE_FIT_THRESHOLD;
 }
+
+export const EXECUTIVE_FIT_MIN = EXECUTIVE_FIT_THRESHOLD;
 
 const BALANCED_BELOW = 60;
 
@@ -121,7 +127,10 @@ export const profileRules: Record<ProfileCode, DecisionProfile> = {
 };
 
 export function getProfile(s: OceanScores): DecisionProfile {
-  const p = percentiles(s);
+  return profileFromPercentiles(percentiles(s));
+}
+
+export function profileFromPercentiles(p: OceanScores): DecisionProfile {
   // Leadership-weight order; a later trait must beat the current best outright.
   const strengths: [ProfileCode, number][] = [
     ["E", p.E], ["C", p.C], ["S", 100 - p.N], ["O", p.O], ["A", p.A],

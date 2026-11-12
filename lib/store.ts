@@ -181,6 +181,31 @@ export function createUser(input: {
   return user;
 }
 
+// Changes a user's own username and/or password. The current password must match.
+// Returns an error message, or null on success. A blank newPassword keeps the old one.
+export function updateCredentials(
+  userId: string,
+  input: { currentPassword: string; newUsername: string; newPassword: string },
+): string | null {
+  const user = getAllUsers().find((u) => u.id === userId);
+  if (!user) return "Your session has expired. Please sign in again.";
+  if (input.currentPassword !== user.password) return "Current password is incorrect.";
+
+  const username = input.newUsername.trim();
+  if (!username) return "Username cannot be empty.";
+  if (/\s/.test(username)) return "Username cannot contain spaces.";
+  const taken = findByUsername(username);
+  if (taken && taken.id !== user.id) return "That username is already taken.";
+
+  if (input.newPassword && input.newPassword.length < 6) return "New password should be at least 6 characters.";
+  if (username === user.username && (!input.newPassword || input.newPassword === user.password)) {
+    return "Nothing to change. Enter a new username or a new password.";
+  }
+
+  saveUser({ ...user, username, password: input.newPassword || user.password });
+  return null;
+}
+
 // --- Session ---------------------------------------------------------------
 export function setSession(userId: string) {
   write(SESSION_KEY, { userId });

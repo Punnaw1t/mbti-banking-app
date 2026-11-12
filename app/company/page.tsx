@@ -11,6 +11,7 @@ import TopBar from "@/components/TopBar";
 import { OceanRadarMini } from "@/components/OceanRadar";
 import ProfileBadge from "@/components/ProfileBadge";
 import EmployeeDetailModal from "@/components/EmployeeDetailModal";
+import HrChatbot from "@/components/HrChatbot";
 
 export default function CompanyPage() {
   const router = useRouter();
@@ -69,6 +70,11 @@ export default function CompanyPage() {
     const executiveFit = scopedEmployees.filter((e) => e.result && isExecutiveFit(e.result.scores)).length;
     return { total: scopedEmployees.length, completed, pending: scopedEmployees.length - completed, executiveFit };
   }, [scopedEmployees]);
+
+  const botContext = useMemo(
+    () => (me ? { viewer: me, employees: scopedEmployees, scope } : null),
+    [me, scopedEmployees, scope],
+  );
 
   function handleExportCsv() {
     const csv = buildEmployeeCsv(filtered);
@@ -236,6 +242,8 @@ export default function CompanyPage() {
       </main>
 
       {viewing && <EmployeeDetailModal employee={viewing} onClose={() => setViewing(null)} />}
+
+      {botContext && <HrChatbot context={botContext} />}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink-700 border border-brass/40 text-slate-50 text-sm px-5 py-3 rounded-md shadow-panel">
