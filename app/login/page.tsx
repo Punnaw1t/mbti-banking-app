@@ -71,8 +71,18 @@ export default function LoginPage() {
       <ThemeToggle className="fixed top-4 right-4 bg-ink-800" />
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <p className="text-xs uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
-          <h1 className="font-display text-3xl text-slate-50">Meridian</h1>
+          <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
+          <h1 className="font-display text-3xl text-slate-50 inline-flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/meridian-logo.png"
+              alt=""
+              width={48}
+              height={48}
+              className="h-12 w-12 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]"
+            />
+            Meridian
+          </h1>
           <p className="text-slate-400 text-sm mt-2">
             Executive Decision-Style Assessment &amp; DSS for HR Executives
           </p>

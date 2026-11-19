@@ -1,6 +1,7 @@
 "use client";
 
 import { Department, EmailLogEntry, OceanScores, SavedDashboard, User } from "./types";
+import { clearDashboardFiles } from "./dashboardFiles";
 
 // =========================================================================
 // DATA COMPONENT (DSS)
@@ -255,5 +256,6 @@ export function resetAllMockData() {
   window.localStorage.removeItem(SESSION_KEY);
   window.localStorage.removeItem(EMAIL_LOG_KEY);
   window.localStorage.removeItem(DASHBOARDS_KEY);
+  clearDashboardFiles().catch(() => {});
   ensureSeeded();
 }

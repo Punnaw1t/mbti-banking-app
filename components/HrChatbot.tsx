@@ -11,20 +11,13 @@ const STATUS: Record<Alert["status"], { icon: string; label: string; className: 
   red: { icon: "✕", label: "Red", className: "text-signal-red border-signal-red/50" },
 };
 
-// Chatbot logo used on the launcher and in the panel header.
+// Chatbot logo (the Meridian emblem) used on the launcher and in the panel header.
+// The PNG is a round badge on a transparent background with a little padding,
+// so it is scaled up slightly to fill its circle.
 function BotLogo({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden>
-      <path d="M16 3.5v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="16" cy="3" r="1.8" fill="currentColor" />
-      <rect x="5" y="7.5" width="22" height="17" rx="6" fill="currentColor" />
-      <path d="M11 24.5 9 29l6-4.5" fill="currentColor" />
-      <circle cx="12" cy="15.5" r="2.2" className="fill-brass" />
-      <circle cx="20" cy="15.5" r="2.2" className="fill-brass" />
-      <path d="M12.5 20.2c2 1.3 5 1.3 7 0" stroke="#B08D57" strokeWidth="1.6" strokeLinecap="round" />
-      <rect x="2" y="13" width="3" height="6" rx="1.5" fill="currentColor" />
-      <rect x="27" y="13" width="3" height="6" rx="1.5" fill="currentColor" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/meridian-logo.png" alt="" aria-hidden className={`object-contain scale-110 ${className}`} />
   );
 }
 
@@ -59,11 +52,13 @@ export default function HrChatbot({ context }: { context: BotContext }) {
   const launcher = (
     <button
       onClick={() => setOpen(!open)}
-      className="group fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-brass text-midnight shadow-panel ring-4 ring-brass/20 hover:bg-brass-light hover:scale-105 transition flex items-center justify-center"
+      className={`group fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full text-midnight shadow-panel ring-4 ring-brass/20 hover:scale-105 transition flex items-center justify-center ${
+        open ? "bg-brass hover:bg-brass-light" : "bg-midnight"
+      }`}
       aria-label={open ? "Close the HR assistant" : "Open the HR assistant"}
       aria-expanded={open}
     >
-      {open ? <span className="text-2xl leading-none" aria-hidden>×</span> : <BotLogo className="h-8 w-8" />}
+      {open ? <span className="text-2xl leading-none" aria-hidden>×</span> : <BotLogo className="h-14 w-14" />}
       {!open && (
         <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-md bg-ink-700 border border-hairline/10 px-2.5 py-1 text-xs text-slate-50 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
           Ask HR Assistant
@@ -83,8 +78,8 @@ export default function HrChatbot({ context }: { context: BotContext }) {
     >
       <header className="flex items-center justify-between px-4 py-3 border-b border-hairline/10">
         <div className="flex items-center gap-3">
-          <span className="h-9 w-9 shrink-0 rounded-full bg-brass text-midnight flex items-center justify-center">
-            <BotLogo className="h-6 w-6" />
+          <span className="h-9 w-9 shrink-0 rounded-full bg-midnight flex items-center justify-center">
+            <BotLogo className="h-9 w-9" />
           </span>
           <div>
             <p className="text-sm text-slate-50 font-medium">HR Assistant</p>

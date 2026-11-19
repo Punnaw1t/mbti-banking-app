@@ -105,12 +105,12 @@ export default function CompanyPage() {
 
   return (
     <div className="min-h-screen">
-      <TopBar user={me} tag="Company Decision-Style Oversight" />
+      <TopBar user={me} tag="Company Decision-Style Oversight" boldTag />
 
       <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
-            <p className="text-xs uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
             <h1 className="font-display text-3xl text-slate-50">Company OCEAN Overview</h1>
             <p className="text-slate-400 text-sm mt-1">
               Review decision-making personality and style across candidates for upper-management roles, and follow up

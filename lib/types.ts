@@ -107,7 +107,11 @@ export interface EmailLogEntry {
 export interface SavedDashboard {
   id: string;
   title: string;
-  url: string; // embed URL (https) shown in an iframe
+  // "link" (default, for rows saved before uploads existed) = embed URL in `url`;
+  // "file" = an uploaded file whose body is in IndexedDB (lib/dashboardFiles.ts).
+  source?: "link" | "file";
+  url: string; // embed URL (https) shown in an iframe; "" for uploaded files
+  file?: { name: string; type: string; size: number };
   description?: string;
   createdAt: string;
   createdBy: string;
