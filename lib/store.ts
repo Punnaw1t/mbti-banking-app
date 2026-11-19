@@ -1,6 +1,6 @@
 "use client";
 
-import { Department, EmailLogEntry, OceanScores, User } from "./types";
+import { Department, EmailLogEntry, OceanScores, SavedDashboard, User } from "./types";
 
 // =========================================================================
 // DATA COMPONENT (DSS)
@@ -17,6 +17,7 @@ import { Department, EmailLogEntry, OceanScores, User } from "./types";
 const USERS_KEY = "ocean_dss_users";
 const SESSION_KEY = "ocean_dss_session";
 const EMAIL_LOG_KEY = "ocean_dss_email_log";
+const DASHBOARDS_KEY = "ocean_dss_dashboards";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -233,10 +234,26 @@ export function getEmailLog(): EmailLogEntry[] {
   return read<EmailLogEntry[]>(EMAIL_LOG_KEY, []);
 }
 
+// --- Saved BI dashboards (Company > Dashboards page) -----------------------
+export function getDashboards(): SavedDashboard[] {
+  return read<SavedDashboard[]>(DASHBOARDS_KEY, []);
+}
+
+export function saveDashboard(entry: SavedDashboard) {
+  const list = getDashboards().filter((d) => d.id !== entry.id);
+  list.unshift(entry);
+  write(DASHBOARDS_KEY, list);
+}
+
+export function deleteDashboard(id: string) {
+  write(DASHBOARDS_KEY, getDashboards().filter((d) => d.id !== id));
+}
+
 export function resetAllMockData() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(USERS_KEY);
   window.localStorage.removeItem(SESSION_KEY);
   window.localStorage.removeItem(EMAIL_LOG_KEY);
+  window.localStorage.removeItem(DASHBOARDS_KEY);
   ensureSeeded();
 }

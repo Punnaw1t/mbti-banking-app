@@ -101,3 +101,14 @@ export interface EmailLogEntry {
   sentAt: string;
   sentBy: string;
 }
+
+// A BI dashboard (Tableau, Power BI, Looker Studio, …) saved by an HR user so it
+// can be viewed inside Meridian, typically built from the "Export for Visualize" CSV.
+export interface SavedDashboard {
+  id: string;
+  title: string;
+  url: string; // embed URL (https) shown in an iframe
+  description?: string;
+  createdAt: string;
+  createdBy: string;
+}

@@ -6,6 +6,11 @@ import { clearSession } from "@/lib/store";
 import { User } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
 
+const HR_NAV = [
+  { href: "/company", label: "Overview" },
+  { href: "/company/dashboards", label: "Dashboards" },
+];
+
 export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -23,6 +28,27 @@ export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
           <span className="hidden sm:inline text-xs uppercase tracking-widest text-brass">
             {tag ?? "Executive Decision-Style DSS"}
           </span>
+          {user?.isHrFlow && (
+            <nav className="flex items-center gap-1 ml-2 sm:ml-4 self-center">
+              {HR_NAV.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`text-sm px-3 py-1.5 rounded-md transition-colors ${
+                      active
+                        ? "bg-brass/15 text-brass"
+                        : "text-slate-400 hover:text-brass"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
           {user && (
