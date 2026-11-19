@@ -21,7 +21,10 @@ export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
   }
 
   return (
-    <header className="border-b border-hairline/10 bg-ink-800/60 backdrop-blur">
+    // Solid ink underlay keeps the bar looking exactly as it did before the
+    // site-wide background photo was added (bg-ink-800/60 over plain ink).
+    <header className="border-b border-hairline/10 bg-ink">
+      <div className="bg-ink-800/60">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 py-4 flex items-center justify-between">
         <div className="flex items-baseline gap-3">
           <span className="font-display text-lg tracking-tight text-slate-50">Meridian</span>
@@ -75,6 +78,7 @@ export default function TopBar({ user, tag }: { user?: User; tag?: string }) {
           )}
           <ThemeToggle />
         </div>
+      </div>
       </div>
     </header>
   );

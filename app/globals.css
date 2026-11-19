@@ -16,6 +16,8 @@
   --slate-600: 84 96 118;
   --hairline: 255 255 255;
   --brass-light: 212 180 131;
+  /* How strongly the page color veils the background photo (0 = photo only). */
+  --bg-veil: 0.35;
 }
 
 html.light {
@@ -31,11 +33,33 @@ html.light {
   --slate-600: 148 163 184;
   --hairline: 15 23 35;
   --brass-light: 124 90 46;
+  --bg-veil: 0.86;
 }
 
-html, body {
+html {
   background-color: rgb(var(--ink));
   color: rgb(var(--slate-50));
+}
+
+/* Transparent so the fixed photo layer below shows through on every page. */
+body {
+  background-color: transparent;
+}
+
+/* Site-wide background photo. A fixed pseudo-element (rather than
+   background-attachment: fixed) so it also stays put on iOS Safari. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(var(--ink) / var(--bg-veil)), rgb(var(--ink) / var(--bg-veil))),
+    url("/meridian-bg.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
 }
 
 * {
