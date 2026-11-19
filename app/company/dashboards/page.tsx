@@ -75,7 +75,7 @@ export default function DashboardsPage() {
     deleteDashboard(d.id);
     const list = getDashboards();
     setDashboards(list);
-    if (selectedId === d.id) setSelectedId(list[0]?.id ?? null);
+    if (selectedId === d.id) setSelectedId(null);
   }
 
   if (!me) {
@@ -153,12 +153,24 @@ export default function DashboardsPage() {
                 return (
                   <li key={d.id}>
                     <button
-                      onClick={() => setSelectedId(d.id)}
+                      onClick={() => setSelectedId(active ? null : d.id)}
+                      aria-expanded={active}
+                      title={active ? "Click to close" : "Click to open"}
                       className={`w-full text-left rounded-md border px-4 py-3 transition-colors ${
                         active ? "border-brass/60 bg-brass/10" : "border-hairline/10 bg-ink-800 hover:border-brass/40"
                       }`}
                     >
-                      <p className={`text-sm ${active ? "text-brass" : "text-slate-50"}`}>{d.title}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className={`text-sm ${active ? "text-brass" : "text-slate-50"}`}>{d.title}</p>
+                        <span
+                          aria-hidden
+                          className={`shrink-0 text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded ${
+                            active ? "bg-brass/20 text-brass" : "text-slate-500"
+                          }`}
+                        >
+                          {active ? "Open" : "Closed"}
+                        </span>
+                      </div>
                       {d.description && <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{d.description}</p>}
                       <p className="text-[11px] text-slate-500 mt-1">
                         {d.createdBy} · {new Date(d.createdAt).toLocaleDateString()}
@@ -168,6 +180,12 @@ export default function DashboardsPage() {
                 );
               })}
             </ul>
+
+            {!selected && (
+              <div className="bg-ink-800 border border-dashed border-hairline/15 rounded-lg flex items-center justify-center min-h-[240px] px-6 text-center">
+                <p className="text-sm text-slate-500">Click a dashboard name to open it. Click it again to close it.</p>
+              </div>
+            )}
 
             {selected && (
               <section className="bg-ink-800 border border-hairline/10 rounded-lg overflow-hidden min-w-0">
