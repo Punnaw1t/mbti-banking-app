@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-// ── Edit the credits here ────────────────────────────────────────────────
+// ── Edit the About Us content here ────────────────────────────────────────────────
 // photo:    put the image in /public/team/ (e.g. public/team/punnawich.jpg).
 //           If the file is missing, the card falls back to the person's initials.
 // linkedin: full profile URL. Leave "" to hide the LinkedIn button.
@@ -91,9 +91,9 @@ export default function CreditsToggle({ className = "" }: { className?: string }
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Close credits" : "Show credits"}
+        aria-label={open ? "Close About Us" : "Show About Us"}
         aria-expanded={open}
-        title="Credits"
+        title="About Us"
         className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${
           open
             ? "border-brass text-brass"
@@ -127,7 +127,7 @@ export default function CreditsToggle({ className = "" }: { className?: string }
             <button
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Close credits"
+              aria-label="Close About Us"
               className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-brass transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -137,7 +137,7 @@ export default function CreditsToggle({ className = "" }: { className?: string }
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/meridian-logo.png" alt="" width={48} height={48} className="mx-auto h-12 w-12 mb-3" />
-            <p className="text-xs font-bold uppercase tracking-widest text-brass mb-1">Credits</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-brass mb-1">About Us</p>
             <h2 id="credits-title" className="font-display text-2xl text-slate-50">Meridian DSS</h2>
             <p className="text-slate-400 text-xs mt-1">Executive Decision-Style Assessment</p>
             {COURSE && (
