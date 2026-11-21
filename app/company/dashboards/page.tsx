@@ -71,14 +71,16 @@ export default function DashboardsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const u = getSessionUser();
-    if (!u) { router.replace("/login"); return; }
-    if (!u.isHrFlow) { router.replace("/dashboard"); return; }
-    setMe(u);
-    const list = getDashboards();
-    setDashboards(list);
-    setSelectedId(list[0]?.id ?? null);
-    if (list.length === 0) setShowForm(true);
+    (async () => {
+      const u = await getSessionUser();
+      if (!u) { router.replace("/login"); return; }
+      if (!u.isHrFlow) { router.replace("/dashboard"); return; }
+      setMe(u);
+      const list = await getDashboards();
+      setDashboards(list);
+      setSelectedId(list[0]?.id ?? null);
+      if (list.length === 0) setShowForm(true);
+    })().catch(() => router.replace("/login"));
   }, [router]);
 
   function resetForm() {
@@ -137,19 +139,29 @@ export default function DashboardsPage() {
       }
     }
 
-    saveDashboard(entry);
-    setDashboards(getDashboards());
+    try {
+      await saveDashboard(entry);
+      setDashboards(await getDashboards());
+    } catch (err) {
+      if (entry.source === "file") deleteDashboardFile(entry.id).catch(() => {});
+      setError((err as Error).message);
+      return;
+    }
     setSelectedId(entry.id);
     resetForm();
     setShowForm(false);
   }
 
-  function handleDelete(d: SavedDashboard) {
+  async function handleDelete(d: SavedDashboard) {
     if (!window.confirm(`Remove "${d.title}" from saved dashboards?`)) return;
-    deleteDashboard(d.id);
+    try {
+      await deleteDashboard(d.id);
+    } catch (err) {
+      window.alert((err as Error).message);
+      return;
+    }
     if (d.source === "file") deleteDashboardFile(d.id).catch(() => {});
-    const list = getDashboards();
-    setDashboards(list);
+    setDashboards(await getDashboards());
     if (selectedId === d.id) setSelectedId(null);
   }
 

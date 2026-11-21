@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearSession } from "@/lib/store";
+import { logout } from "@/lib/store";
 import { User } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -15,8 +15,8 @@ export default function TopBar({ user, tag, boldTag = false }: { user?: User; ta
   const router = useRouter();
   const pathname = usePathname();
 
-  function handleSignOut() {
-    clearSession();
+  async function handleSignOut() {
+    await logout();
     router.push("/login");
   }
 

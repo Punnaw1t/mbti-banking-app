@@ -80,3 +80,163 @@ body::before {
 input[type="range"] {
   accent-color: #B08D57;
 }
+
+/* ───────────── Splash / intro animation (app/page.tsx) ───────────── */
+.splash {
+  transition: opacity 600ms ease, transform 600ms ease;
+}
+.splash-leave {
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+.splash-logo {
+  opacity: 0;
+  animation: splash-logo-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms forwards;
+}
+
+.splash-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid rgb(176 141 87 / 0.55);
+  opacity: 0;
+}
+.splash-ring-outer {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  animation: splash-fade-in 700ms ease 300ms forwards, splash-spin 6s linear infinite;
+}
+.splash-ring-inner {
+  inset: 14px;
+  border-color: rgb(176 141 87 / 0.3);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: splash-fade-in 700ms ease 450ms forwards, splash-spin-rev 4.5s linear infinite;
+}
+.splash-glow {
+  position: absolute;
+  inset: 20px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(176 141 87 / 0.35), transparent 70%);
+  opacity: 0;
+  animation: splash-pulse 2.4s ease-in-out 600ms infinite;
+}
+
+.splash-eyebrow {
+  opacity: 0;
+  animation: splash-rise 700ms ease 600ms forwards;
+}
+
+.splash-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(6px);
+  animation: splash-letter-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.splash-rule {
+  display: block;
+  height: 1px;
+  width: 160px;
+  background: linear-gradient(90deg, transparent, #B08D57, transparent);
+  transform: scaleX(0);
+  animation: splash-rule-in 900ms ease 1800ms forwards;
+}
+
+.splash-tagline {
+  opacity: 0;
+  animation: splash-rise 700ms ease 2200ms forwards;
+}
+
+.splash-track {
+  opacity: 0;
+  animation: splash-fade-in 500ms ease 400ms forwards;
+}
+.splash-progress {
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  animation-name: splash-progress;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes splash-logo-in {
+  from { opacity: 0; transform: scale(0.6) rotate(-20deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes splash-fade-in {
+  to { opacity: 1; }
+}
+@keyframes splash-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes splash-spin-rev {
+  to { transform: rotate(-360deg); }
+}
+@keyframes splash-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50%      { opacity: 0.8;  transform: scale(1.1); }
+}
+@keyframes splash-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splash-letter-in {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes splash-rule-in {
+  to { transform: scaleX(1); }
+}
+@keyframes splash-progress {
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo, .splash-ring, .splash-glow, .splash-eyebrow, .splash-letter,
+  .splash-rule, .splash-tagline, .splash-track {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ───────────── Credits modal (components/CreditsToggle.tsx) ───────────── */
+.credits-backdrop {
+  animation: splash-fade-in 200ms ease forwards;
+  opacity: 0;
+}
+.credits-panel {
+  animation: credits-pop 260ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes credits-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .credits-backdrop, .credits-panel { animation: none; opacity: 1; }
+}
+
+/* ───────────── HR chatbot typing indicators (components/HrChatbot.tsx) ───────────── */
+.chat-dots { display: inline-flex; gap: 3px; }
+.chat-dots span {
+  width: 5px; height: 5px; border-radius: 9999px; background: #B08D57;
+  animation: chat-dot 1s ease-in-out infinite;
+}
+.chat-dots span:nth-child(2) { animation-delay: 150ms; }
+.chat-dots span:nth-child(3) { animation-delay: 300ms; }
+@keyframes chat-dot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-3px); }
+}
+.chat-caret {
+  display: inline-block; width: 6px; height: 14px; margin-left: 2px; vertical-align: -2px;
+  background: #B08D57; animation: chat-blink 900ms steps(2) infinite;
+}
+@keyframes chat-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .chat-dots span, .chat-caret { animation: none; }
+}

@@ -21,13 +21,14 @@ export default function AccountPage() {
   const [saved, setSaved] = useState<string | null>(null);
 
   useEffect(() => {
-    const u = getSessionUser();
-    if (!u) { router.replace("/login"); return; }
-    setMe(u);
-    setUsername(u.username);
+    getSessionUser().then((u) => {
+      if (!u) { router.replace("/login"); return; }
+      setMe(u);
+      setUsername(u.username);
+    }).catch(() => router.replace("/login"));
   }, [router]);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSaved(null);
@@ -36,12 +37,12 @@ export default function AccountPage() {
       setError("New password and confirmation do not match.");
       return;
     }
-    const problem = updateCredentials(me.id, { currentPassword, newUsername: username, newPassword });
+    const problem = await updateCredentials({ currentPassword, newUsername: username, newPassword });
     if (problem) {
       setError(problem);
       return;
     }
-    const updated = getSessionUser();
+    const updated = await getSessionUser().catch(() => undefined);
     const changed = [
       updated && updated.username !== me.username ? "username" : null,
       newPassword ? "password" : null,

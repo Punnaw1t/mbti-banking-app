@@ -84,7 +84,6 @@ export interface User {
   id: string;
   name: string;
   username: string;
-  password: string; // mock-only, plaintext for prototype purposes
   email: string;
   department: Department;
   isHrFlow: boolean;

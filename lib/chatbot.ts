@@ -66,7 +66,7 @@ export const INTENTS: { id: IntentId; label: string; example: string }[] = [
 // ---------- knowledge used by the rules ----------
 const PROFILE_ORDER: ProfileCode[] = ["E", "C", "S", "O", "A", "B"];
 
-const NINE_BOX: Record<number, { label: string; perf: string; pot: string; action: string }> = {
+export const NINE_BOX: Record<number, { label: string; perf: string; pot: string; action: string }> = {
   1: { label: "Enigma", perf: "Low", pot: "High", action: "Find the barrier, coach, consider a better-fit role" },
   2: { label: "Growth Employee", perf: "Medium", pot: "High", action: "Stretch assignment and development plan" },
   3: { label: "Star", perf: "High", pot: "High", action: "Succession pool, retain and prepare for promotion" },
@@ -78,7 +78,7 @@ const NINE_BOX: Record<number, { label: string; perf: string; pot: string; actio
   9: { label: "Solid Performer", perf: "High", pot: "Low", action: "Recognize expertise, keep as specialist" },
 };
 
-const KPI_INFO: Record<number, { name: string; rule: string; meaning: string }> = {
+export const KPI_INFO: Record<number, { name: string; rule: string; meaning: string }> = {
   1: { name: "Trait Percentile", rule: "Yellow when a department's mean percentile on a trait is outside 40 to 60", meaning: "Where each person sits on O, C, E, A and N against 592,204 benchmark respondents." },
   2: { name: "Decision Profile Distribution", rule: "Yellow when one profile is over 35% of a team, Red over 50%", meaning: "Share of results in each of the six decision profiles." },
   3: { name: "Executive Fit Rate", rule: "Red when a department falls below 10%", meaning: "Share of results with a Leadership Index of 70 or more." },

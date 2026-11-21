@@ -14,10 +14,11 @@ export default function ResultPage() {
   const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
-    const u = getSessionUser();
+    getSessionUser().then((u) => {
     if (!u) { router.replace("/login"); return; }
     if (!u.result) { router.replace("/assessment"); return; }
     setUser(u);
+    }).catch(() => router.replace("/login"));
   }, [router]);
 
   if (!user || !user.result) {

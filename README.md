@@ -6,8 +6,8 @@
 
 The system helps identify whether a leader's natural decision-making style matches the requirements of their role. If a mismatch is found, the organization can use the results to support better role placement, leadership development, and improved decision-making effectiveness.
 
-Stack: **Next.js 14 (App Router) + TypeScript + Tailwind CSS**, fully responsive, mock
-localStorage-backed data layer (no external DB/API needed to run the prototype).
+Stack: **Next.js 14 (App Router) + TypeScript + Tailwind CSS + PostgreSQL 16 (Docker)**, fully
+responsive. Pages talk to Next.js API routes (`app/api/*`), which read and write Postgres.
 
 ---
 
@@ -117,8 +117,8 @@ flowchart TD
 
 ## 5. ER diagram (database design)
 
-The prototype stores this shape in `localStorage`; the same schema maps directly onto
-relational tables for a production build.
+The app stores this shape in PostgreSQL (`db/init/01_schema.sql`): `departments`, `users`,
+`test_results`, `email_log`, plus `dashboards` and `sessions`.
 
 ### 5.1 Data required by the system
 
@@ -212,8 +212,8 @@ erDiagram
     }
 ```
 
-> Note on the prototype vs. this diagram: the current `localStorage` layer (`lib/store.ts`)
-> only persists `USER` (with its `TestResult` embedded) and `EMAIL_LOG` — `QUESTION`,
+> Note on the prototype vs. this diagram: the Postgres database persists `DEPARTMENT`, `USER`,
+> `TEST_RESULT`, `EMAIL_LOG`, saved dashboards and login sessions — `QUESTION`,
 > `ANSWER`, `DECISION_PROFILE`, `OCEAN_NORM`, and `DEPARTMENT_SCOPE` are static/derived in code
 > (`lib/questions.ts`, `lib/ocean.ts`, `lib/oceanNorms.ts`, `lib/types.ts`). They are included
 > here because they are still data the *system* depends on, and a production build would
@@ -286,10 +286,30 @@ Figma if a high-fidelity mock is required for submission):
 
 ### 8.1 HR Assistant (decision support chatbot)
 
-The round chatbot logo at the bottom right of the Company Overview opens a rule-based chatbot
-(`lib/chatbot.ts`, UI in `components/HrChatbot.tsx`). It has no language model and needs
-no API key: each question is matched to an intent, and the answer comes from the KPI
-alert rules and IF-THEN rules in `lib/ocean.ts`, so every answer can be traced to a rule.
+The round chatbot logo at the bottom right of the Company Overview opens the HR Assistant
+(UI in `components/HrChatbot.tsx`). It has two layers:
+
+1. **Rule engine** (`lib/chatbot.ts`): each question is matched to an intent, and the answer
+   comes from the KPI alert rules and IF-THEN rules in `lib/ocean.ts`, so every figure can be
+   traced to a rule.
+2. **Free LLM** (`app/api/chat`, `lib/server/llm.ts`, `lib/server/chatPrompt.ts`): the server
+   loads the employees in the viewer's scope from Postgres, runs the rule engine, and gives the
+   model only that data (rule answer, KPI overview, employee table, workforce stats, rule
+   definitions). The model writes a natural-language answer, in Thai or English, which streams
+   into the chat. The rule engine's tables and alerts stay available under
+   **Data from the rule engine**.
+
+The default model is **Qwen 2.5 3B** on **Ollama**, started by `docker compose up -d` (the
+`ollama-pull` service downloads it, ~1.9 GB, on first run). It is free, needs no API key, and no
+employee data leaves the machine. If the model is unreachable the chatbot falls back to the rule
+engine on its own; the header shows which mode is active.
+
+Docker on macOS can't use the Apple GPU, so the model runs on CPU: the first question takes about
+a minute and later ones are faster because the prompt is cached. To speed it up, either install
+Ollama natively (`brew install ollama && ollama serve`, then `ollama pull qwen2.5:3b`; set
+`LLM_BASE_URL=http://localhost:11434/v1` and stop the Docker `ollama` service), or point
+`LLM_BASE_URL`/`LLM_MODEL`/`LLM_API_KEY` in `.env.local` at a free cloud API (Groq, Gemini,
+OpenRouter; see `.env.example`). With a cloud API, employee data is sent to that provider.
 It only sees the departments in the signed-in role's scope.
 
 | Intent | Example question | Rules used |
@@ -317,18 +337,34 @@ python data/build_workforce_stats.py --repo .
 ---
 
 ## 9. Getting started
-1. Open terminal in your Machine
-2. Run this command
+Requires Node.js and Docker Desktop.
+
 ```bash
 npm install
+cp .env.example .env.local   # DATABASE_URL for the Docker database
+npm run db:up                # start Postgres (5433), Adminer (8082) and Ollama LLM (11434)
+npm run db:check             # verify the connection, tables and seed data
 npm run dev
 ```
-3. Then open http://localhost:3000.
+Then open http://localhost:3000.
+
+The schema and demo data in `db/init/` load automatically the first time the database starts.
+
+### 9.1 Checking the database
+| How | What it shows |
+|---|---|
+| `npm run db:check` | Connection, row count per table, integrity checks (orphan results, duplicate usernames, unhashed passwords, HR accounts with results), and a table of every user |
+| http://localhost:3000/api/health | JSON: is the DB reachable, latency, row counts |
+| http://localhost:8082 (Adminer) | Browse and query tables in the browser. System **PostgreSQL**, Server **db**, User / Password / Database **meridian** |
+| `npm run db:psql` | A `psql` shell inside the container |
+
+Other scripts: `npm run db:down` (stop), `npm run db:reset` (stop, **delete all data**, start fresh from the seed).
+The **Reset demo data** link on the login page also re-seeds the database (disabled in production).
 
 ---
 
 ## 10. Demo accounts 
-(seeded automatically on first load):
+(seeded from `db/init/02_seed.sql`):
 | Username | Password | Department | Flow |
 |---|---|---|---|
 | aran.suksawat | password123 | Retail Banking | Flow 1 (has a result) |
@@ -338,4 +374,5 @@ npm run dev
 | cto.peter | hrpass123 | Chief Technology Officer | Flow 2 (IT Support only) |
 | em.nan | hrpass123 | Engineering Manager | Flow 2 (Retail/Corporate Banking, Customer Service, Finance & Accounting) |
 
-All data is mock and stored in the browser's `localStorage` — no backend required.
+Passwords are stored as bcrypt hashes (`pgcrypto`). Uploaded dashboard *files* still live in the
+browser's IndexedDB; only their metadata is in Postgres.

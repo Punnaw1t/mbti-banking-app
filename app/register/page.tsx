@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createUser, findByUsername, setSession } from "@/lib/store";
+import { register } from "@/lib/store";
 import { Department } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -27,22 +27,28 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState<Department>("Retail Banking");
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setError(null);
 
-    if (findByUsername(username.trim())) {
-      setError("That username is already taken.");
-      return;
-    }
     if (password.length < 6) {
       setError("Password should be at least 6 characters.");
       return;
     }
 
-    const user = createUser({ name: name.trim(), username: username.trim(), password, email: email.trim(), department });
-    setSession(user.id);
+    setBusy(true);
+    let user;
+    try {
+      // The server checks the username isn't taken and stores the account in the database.
+      user = await register({ name: name.trim(), username: username.trim(), password, email: email.trim(), department });
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+      return;
+    }
 
     // Flow 1: register -> login (implicit) -> do OCEAN assessment -> result -> dashboard
     // Flow 2 accounts created here still go straight into oversight, matching the login rule.
@@ -104,9 +110,9 @@ export default function RegisterPage() {
             <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-md px-3 py-2">{error}</p>
           )}
 
-          <button type="submit"
-            className="w-full rounded-md bg-brass text-midnight font-medium py-2.5 text-sm hover:bg-brass-light transition-colors">
-            Create account &amp; continue
+          <button type="submit" disabled={busy}
+            className="w-full rounded-md bg-brass text-midnight font-medium py-2.5 text-sm hover:bg-brass-light transition-colors disabled:opacity-60">
+            {busy ? "Creating account…" : <>Create account &amp; continue</>}
           </button>
 
           <p className="text-center text-sm text-slate-400">

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAllUsers, getSessionUser, logEmail, getEmailLog } from "@/lib/store";
+import { getEmployees, getSessionUser, logEmail, getEmailLog } from "@/lib/store";
 import { User, EmailLogEntry, BUSINESS_DEPARTMENTS, getViewableDepartments } from "@/lib/types";
 import { buildEmployeeCsv, downloadCsv } from "@/lib/csv";
 import { buildFollowUpEmail, buildMailtoHref } from "@/lib/email";
@@ -26,17 +26,27 @@ export default function CompanyPage() {
   const [viewing, setViewing] = useState<User | null>(null);
 
   useEffect(() => {
-    const u = getSessionUser();
-    if (!u) { router.replace("/login"); return; }
-    if (!u.isHrFlow) { router.replace("/dashboard"); return; }
-    setMe(u);
-    refresh();
+    getSessionUser().then((u) => {
+      if (!u) { router.replace("/login"); return; }
+      if (!u.isHrFlow) { router.replace("/dashboard"); return; }
+      setMe(u);
+      refresh();
+    }).catch(() => router.replace("/login"));
   }, [router]);
 
-  function refresh() {
-    const all = getAllUsers().filter((u) => !u.isHrFlow);
-    setEmployees(all);
-    setLog(getEmailLog());
+  async function refresh() {
+    try {
+      const [all, emails] = await Promise.all([getEmployees(), getEmailLog()]);
+      setEmployees(all);
+      setLog(emails);
+    } catch (err) {
+      flash((err as Error).message);
+    }
+  }
+
+  function flash(message: string) {
+    setToast(message);
+    setTimeout(() => setToast(null), 4000);
   }
 
   // Departments this signed-in role is permitted to see: HR/CEO see everything,
@@ -85,18 +95,10 @@ export default function CompanyPage() {
   function handleFollowUpClick(target: User) {
     if (!me) return;
     const { subject, body } = buildFollowUpEmail(target, me.name);
-    logEmail({
-      id: "e-" + Date.now(),
-      toUserId: target.id,
-      toEmail: target.email,
-      subject,
-      body,
-      sentAt: new Date().toISOString(),
-      sentBy: me.name,
-    });
-    setToast(`Opening your email client to message ${target.name}…`);
-    refresh();
-    setTimeout(() => setToast(null), 4000);
+    flash(`Opening your email client to message ${target.name}…`);
+    logEmail({ toUserId: target.id, subject, body })
+      .then(() => refresh())
+      .catch((err) => flash(`Couldn't log the email: ${(err as Error).message}`));
   }
 
   if (!me) {

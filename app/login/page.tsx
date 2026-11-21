@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { findByUsername, setSession, ensureSeeded, resetAllMockData } from "@/lib/store";
+import { login, resetAllMockData } from "@/lib/store";
 import { Department } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
+import CreditsToggle from "@/components/CreditsToggle";
 
 const DEPARTMENTS: Department[] = [
   "Retail Banking",
@@ -21,38 +22,43 @@ const DEPARTMENTS: Department[] = [
 
 export default function LoginPage() {
   const router = useRouter();
-  ensureSeeded();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState<Department>("Retail Banking");
   const [error, setError] = useState<string | null>(null);
   const [resetDone, setResetDone] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function handleResetDemoData() {
-    resetAllMockData();
-    setUsername("");
-    setPassword("");
+  async function handleResetDemoData() {
     setError(null);
-    setResetDone(true);
+    setResetDone(false);
+    try {
+      await resetAllMockData();
+      setUsername("");
+      setPassword("");
+      setResetDone(true);
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setError(null);
     setResetDone(false);
 
-    const user = findByUsername(username.trim());
-    if (!user || user.password !== password) {
-      setError("Incorrect username or password.");
+    setBusy(true);
+    let user;
+    try {
+      // Username, password and department are all checked against the database.
+      user = await login({ username: username.trim(), password, department });
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
       return;
     }
-    if (user.department !== department) {
-      setError("Selected department does not match this account's record.");
-      return;
-    }
-
-    setSession(user.id);
 
     // Routing rule:
     // Normal employee departments -> Flow 1 (assess -> result -> dashboard)
@@ -68,7 +74,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-12">
-      <ThemeToggle className="fixed top-4 right-4 bg-ink-800" />
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        <CreditsToggle className="bg-ink-800" />
+        <ThemeToggle className="bg-ink-800" />
+      </div>
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
@@ -139,9 +148,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full rounded-md bg-brass text-midnight font-medium py-2.5 text-sm hover:bg-brass-light transition-colors"
+            disabled={busy}
+            className="w-full rounded-md bg-brass text-midnight font-medium py-2.5 text-sm hover:bg-brass-light transition-colors disabled:opacity-60"
           >
-            Sign in
+            {busy ? "Signing in…" : "Sign in"}
           </button>
 
           <p className="text-center text-sm text-slate-400">

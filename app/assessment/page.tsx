@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { questionBank } from "@/lib/questions";
 import { buildResult } from "@/lib/ocean";
-import { getSessionUser, saveUser } from "@/lib/store";
+import { getSessionUser, saveResult } from "@/lib/store";
 import { LikertAnswer, User } from "@/lib/types";
 import TopBar from "@/components/TopBar";
 
@@ -22,34 +22,49 @@ export default function AssessmentPage() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<LikertAnswer[]>([]);
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
-    const u = getSessionUser();
-    if (!u) {
-      router.replace("/login");
-      return;
-    }
-    if (u.isHrFlow) {
-      router.replace("/company");
-      return;
-    }
-    setUser(u);
+    getSessionUser().then((u) => {
+      if (!u) {
+        router.replace("/login");
+        return;
+      }
+      if (u.isHrFlow) {
+        router.replace("/company");
+        return;
+      }
+      setUser(u);
+    }).catch(() => router.replace("/login"));
   }, [router]);
+
+  async function submit(all: LikertAnswer[]) {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveResult(buildResult(all).scores);
+      router.push("/result");
+    } catch (err) {
+      setSaveError((err as Error).message);
+      setSaving(false);
+    }
+  }
 
   const total = questionBank.length;
   const question = questionBank[step];
   const progressPct = useMemo(() => Math.round((step / total) * 100), [step, total]);
 
   function choose(answer: LikertAnswer) {
-    const next = [...answers, answer];
+    if (saving) return;
+    // slice() so a retry after a failed save doesn't append a 51st answer.
+    const next = [...answers.slice(0, step), answer];
     setAnswers(next);
 
     if (step + 1 < total) {
       setStep(step + 1);
     } else if (user) {
-      const result = buildResult(next);
-      const updated: User = { ...user, result };
-      saveUser(updated);
-      router.push("/result");
+      submit(next);
     }
   }
 
@@ -105,10 +120,17 @@ export default function AssessmentPage() {
           ))}
         </div>
 
+        {saving && <p className="mt-6 text-sm text-slate-400">Saving your result…</p>}
+        {saveError && (
+          <p className="mt-6 text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-md px-3 py-2">
+            {saveError} Choose your answer again to retry.
+          </p>
+        )}
+
         <div className="mt-8">
           <button
             onClick={goBack}
-            disabled={step === 0}
+            disabled={step === 0 || saving}
             className="text-sm text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             ← Previous statement
