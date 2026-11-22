@@ -29,6 +29,19 @@ function extractEmbedUrl(input: string): string | null {
     if (/^(datastudio|lookerstudio)\.google\.com$/.test(url.hostname) && url.pathname.startsWith("/reporting/")) {
       url.pathname = "/embed" + url.pathname;
     }
+    // Power BI blocks framing of the normal report page (/groups/<ws>/reports/<id>/<page>);
+    // only /reportEmbed?reportId=… may be iframed. Rewrite browser links to that form.
+    const pbi = url.hostname === "app.powerbi.com"
+      && url.pathname.match(/^\/groups\/[^/]+\/reports\/([0-9a-f-]{36})(?:\/([^/?#]+))?/i);
+    if (pbi) {
+      const embed = new URL("https://app.powerbi.com/reportEmbed");
+      embed.searchParams.set("reportId", pbi[1]);
+      embed.searchParams.set("autoAuth", "true");
+      const ctid = url.searchParams.get("ctid");
+      if (ctid) embed.searchParams.set("ctid", ctid);
+      if (pbi[2] && pbi[2] !== "ReportSection") embed.searchParams.set("pageName", pbi[2]);
+      return embed.toString();
+    }
     return url.toString();
   } catch {
     return null;
