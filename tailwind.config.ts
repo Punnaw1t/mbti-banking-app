@@ -45,6 +45,12 @@ const config: Config = {
           '"Iowan Old Style"', '"Palatino Linotype"', "Palatino", '"URW Palladio L"',
           "Georgia", "serif",
         ],
+        // Brand wordmark ("Meridian"). Baltime is loaded via @font-face in globals.css
+        // from /public/fonts/; falls back to the display serif if the file is missing.
+        brand: [
+          '"Baltime"', '"Iowan Old Style"', '"Palatino Linotype"', "Palatino",
+          '"URW Palladio L"', "Georgia", "serif",
+        ],
         body: [
           "-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto",
           '"Helvetica Neue"', "Arial", "sans-serif",

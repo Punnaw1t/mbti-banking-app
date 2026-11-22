@@ -27,7 +27,7 @@ export default function TopBar({ user, tag, boldTag = false }: { user?: User; ta
       <div className="bg-ink-800/60">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 py-4 flex items-center justify-between">
         <div className="flex items-baseline gap-3">
-          <span className="font-display text-lg tracking-tight text-slate-50">Meridian</span>
+          <span className="font-brand text-lg tracking-tight text-slate-50">Meridian</span>
           <span className={`hidden sm:inline text-xs uppercase tracking-widest text-brass ${boldTag ? "font-bold" : ""}`}>
             {tag ?? "Executive Decision-Style DSS"}
           </span>

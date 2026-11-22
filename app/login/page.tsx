@@ -81,7 +81,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
-          <h1 className="font-display text-3xl text-slate-50 inline-flex items-center gap-3">
+          <h1 className="font-brand text-3xl text-slate-50 inline-flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/meridian-logo.png"

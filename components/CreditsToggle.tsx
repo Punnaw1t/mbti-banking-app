@@ -6,26 +6,30 @@ import { useEffect, useState } from "react";
 // photo:    put the image in /public/team/ (e.g. public/team/punnawich.jpg).
 //           If the file is missing, the card falls back to the person's initials.
 // linkedin: full profile URL. Leave "" to hide the LinkedIn button.
-type Creator = { name: string; roles: string[]; photo: string; linkedin: string };
+// github:   full profile URL. Leave "" to hide the GitHub button.
+type Creator = { name: string; roles: string[]; photo: string; linkedin: string; github: string };
 
 const CREATORS: Creator[] = [
   {
     name: "Mr. Punnawich Kanogpornwanich",
-    roles: ["Team Lead", "Data Engineer", "Software Developer", "Project Manager"],
+    roles: ["DataOps", "Data Engineer", "Software Developer", "Project Manager"],
     photo: "/team/punnawich.jpg",
     linkedin: "https://www.linkedin.com/in/punnawit-kanogpornwanich-823bb3281/",
+    github: "https://github.com/Punnaw1t",
   },
   {
     name: "Mr. Bhumipat Bengpaiboon",
     roles: ["Data Analysis", "Project Consultant", "BI Developer", "Software Developer"],
     photo: "/team/bhumipat.jpg",
     linkedin: "https://www.linkedin.com/in/bhumipat-pengpaiboon-143902288/",
+    github: "https://github.com/Garf1e1d",
   },
   {
     name: "Mr. Napas Siripaskrittakul",
     roles: ["Data Analysis", "LLM Tester", "Business Analysis", "AI Engineer"],
     photo: "/team/napas.jpg",
     linkedin: "https://www.linkedin.com/in/greatnapas/",
+    github: "https://github.com/greatnapas",
   },
 ];
 
@@ -63,6 +67,14 @@ function Avatar({ name, photo }: { name: string; photo: string }) {
       onError={() => setFailed(true)}
       className="h-14 w-14 shrink-0 rounded-full border border-brass/50 object-cover"
     />
+  );
+}
+
+function GitHubIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z" />
+    </svg>
   );
 }
 
@@ -138,7 +150,7 @@ export default function CreditsToggle({ className = "" }: { className?: string }
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/meridian-logo.png" alt="" width={48} height={48} className="mx-auto h-12 w-12 mb-3" />
             <p className="text-xs font-bold uppercase tracking-widest text-brass mb-1">About Us</p>
-            <h2 id="credits-title" className="font-display text-2xl text-slate-50">Meridian DSS</h2>
+            <h2 id="credits-title" className="font-brand text-2xl text-slate-50">Meridian DSS</h2>
             <p className="text-slate-400 text-xs mt-1">Executive Decision-Style Assessment</p>
             {COURSE && (
               <p className="mt-3 inline-block rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-xs text-brass-light">
@@ -169,17 +181,33 @@ export default function CreditsToggle({ className = "" }: { className?: string }
                       ))}
                     </div>
                   </div>
-                  {c.linkedin && (
-                    <a
-                      href={c.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${c.name} on LinkedIn`}
-                      title="LinkedIn"
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
-                    >
-                      <LinkedInIcon />
-                    </a>
+                  {(c.linkedin || c.github) && (
+                    <div className="flex shrink-0 flex-col gap-1.5">
+                      {c.linkedin && (
+                        <a
+                          href={c.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${c.name} on LinkedIn`}
+                          title="LinkedIn"
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
+                        >
+                          <LinkedInIcon />
+                        </a>
+                      )}
+                      {c.github && (
+                        <a
+                          href={c.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${c.name} on GitHub`}
+                          title="GitHub"
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
+                        >
+                          <GitHubIcon />
+                        </a>
+                      )}
+                    </div>
                   )}
                 </li>
               ))}

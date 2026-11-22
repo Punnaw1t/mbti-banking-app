@@ -64,7 +64,7 @@ export default function Home() {
           Siam Bank Corp · Internal Tool
         </p>
 
-        <h1 className="font-display text-5xl sm:text-6xl text-slate-50 flex" aria-label="Meridian">
+        <h1 className="font-brand text-5xl sm:text-6xl text-slate-50 flex" aria-label="Meridian">
           {"Meridian".split("").map((ch, i) => (
             <span
               key={i}

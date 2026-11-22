@@ -1,4 +1,15 @@
 @tailwind base;
+
+/* Brand wordmark font. Put the font file(s) in public/fonts/ with these names. */
+@font-face {
+  font-family: "Baltime";
+  src: local("Baltime"), local("Baltime Regular"),
+    url("/fonts/Baltime.woff2") format("woff2"),
+    url("/fonts/Baltime.woff") format("woff"),
+    url("/fonts/Baltime.otf") format("opentype"),
+    url("/fonts/Baltime.ttf") format("truetype");
+  font-display: swap;
+}
 @tailwind components;
 @tailwind utilities;
 
