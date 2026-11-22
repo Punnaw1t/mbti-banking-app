@@ -314,13 +314,13 @@ It only sees the departments in the signed-in role's scope.
 
 | Intent | Example question | Rules used |
 |---|---|---|
-| KPI status | Show the KPI overview | KPI 2–7 alert thresholds, Red/Yellow/Green |
-| Recommendation | What should we do first? | Alert rules → actions, X1–X3 |
-| Scenario (input to advice) | Low performance band is 52% and stars are 9% · E 80, C 55, O 60, A 40, N 30 · Leadership index 74 and the employee is a Star | KPI thresholds, profile rules R1–R7, L1/L2, X1/X2 |
+| KPI status | Show the KPI overview | Rule set 10 (KPI 2–7 Red/Yellow/Green), rule set 11 situation |
+| Recommendation | What should we do first? | Rule set 12 (REC-2 to REC-15), rule 12-16 ranking, rule set 9 talent actions |
+| Scenario (input to advice) | Low performance band is 52% and stars are 9% · E 80, C 55, O 60, A 40, N 30 · Leadership index 74 and the employee is a Star | Rule sets 4, 5, 9, 10 and 12 |
 | Department | Stats for IT Support · Compare departments | KPI 2–6 per department |
 | Profiles | Profile distribution in Retail Banking | KPI 2 |
 | Employee | Tell me about Aran | Profile, Leadership Index, L1/L2 |
-| Shortlist | Who should be on the succession shortlist? | L1, X1, X2 |
+| Shortlist | Who should be on the succession shortlist? | Rules 5-1, 9-1 (REC-3), 9-3 (REC-5) |
 | 9-Box | How many Enigmas are there? · Show the 9-box grid | 9-Box cells and actions, KPI 6 |
 | Pending | Who hasn't completed the assessment? | KPI 7 |
 | Explain | How is the Leadership Index calculated? · What is KPI 4? | Knowledge base |

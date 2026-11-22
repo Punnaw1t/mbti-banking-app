@@ -10,8 +10,9 @@ import { DepartmentStats, WORKFORCE_STATS } from "./workforceStats";
 // -------------------------------------------------------------------------
 // A rule-based advisor for the HR page. Each question is matched to one
 // intent, entities (department, profile, trait, 9-Box cell, employee, numbers)
-// are pulled from the text, and the answer is built from the same KPI alert
-// rules and IF-THEN rules as the report. There is no language model, so every
+// are pulled from the text, and the answer is built from the rule sets of the
+// Part 2 report: 4 and 5 (profile, executive fit), 9 (talent action),
+// 10 (KPI alert colours), 11 (department situation) and 12 (REC-1 to REC-15). There is no language model, so every
 // answer can be traced to a rule.
 //
 // Two data sources, always labelled in the answer:
@@ -57,7 +58,7 @@ export const INTENTS: { id: IntentId; label: string; example: string }[] = [
   { id: "department", label: "Department snapshot or comparison", example: "Stats for IT Support" },
   { id: "profiles", label: "Decision profile distribution", example: "Profile distribution in Retail Banking" },
   { id: "employee", label: "One employee's profile and advice", example: "Tell me about Aran" },
-  { id: "shortlist", label: "Executive-fit shortlist (rules L1, X1)", example: "Who should be on the succession shortlist?" },
+  { id: "shortlist", label: "Succession shortlist (rules 5-1, 9-1)", example: "Who should be on the succession shortlist?" },
   { id: "nine_box", label: "9-Box Talent Grid counts and actions", example: "How many Enigmas are there?" },
   { id: "pending", label: "Employees who have not taken the test", example: "Who hasn't completed the assessment?" },
   { id: "explain", label: "How a rule or KPI works", example: "How is the Leadership Index calculated?" },
@@ -65,27 +66,29 @@ export const INTENTS: { id: IntentId; label: string; example: string }[] = [
 
 // ---------- knowledge used by the rules ----------
 const PROFILE_ORDER: ProfileCode[] = ["E", "C", "S", "O", "A", "B"];
+// Rule set 4 (Part 2, Table 33), with the Part 1 rule names R1 to R6.
+const PROFILE_RULE: Record<ProfileCode, string> = { E: "4-1 (R1)", C: "4-2 (R2)", S: "4-3 (R3)", O: "4-4 (R4)", A: "4-5 (R5)", B: "4-6 (R6)" };
 
 export const NINE_BOX: Record<number, { label: string; perf: string; pot: string; action: string }> = {
-  1: { label: "Enigma", perf: "Low", pot: "High", action: "Find the barrier, coach, consider a better-fit role" },
-  2: { label: "Growth Employee", perf: "Medium", pot: "High", action: "Stretch assignment and development plan" },
-  3: { label: "Star", perf: "High", pot: "High", action: "Succession pool, retain and prepare for promotion" },
-  4: { label: "Dilemma", perf: "Low", pot: "Medium", action: "Performance plan with close coaching" },
-  5: { label: "Core Player", perf: "Medium", pot: "Medium", action: "Keep engaged, targeted skill training" },
-  6: { label: "High Performer", perf: "High", pot: "Medium", action: "Reward and widen scope to build potential" },
-  7: { label: "Underperformer", perf: "Low", pot: "Low", action: "Performance plan, consider role change" },
-  8: { label: "Average Performer", perf: "Medium", pot: "Low", action: "Clarify goals, keep in current role" },
-  9: { label: "Solid Performer", perf: "High", pot: "Low", action: "Recognize expertise, keep as specialist" },
+  1: { label: "Enigma", perf: "Low", pot: "High", action: "Coaching plan by HR Staff (rule 9-2, REC-4)" },
+  2: { label: "Growth Employee", perf: "Medium", pot: "High", action: "Stretch work by the Engineering Manager or CTO (rule 9-3, REC-5)" },
+  3: { label: "Star", perf: "High", pot: "High", action: "Succession shortlist when executive fit (rule 9-1, REC-3), otherwise stretch work (rule 9-3, REC-5)" },
+  4: { label: "Dilemma", perf: "Low", pot: "Medium", action: "Coaching plan by HR Staff (rule 9-2, REC-4)" },
+  5: { label: "Core Player", perf: "Medium", pot: "Medium", action: "Keep in role and develop by profile (rule 9-5, REC-7)" },
+  6: { label: "High Performer", perf: "High", pot: "Medium", action: "Stretch work by the Engineering Manager or CTO (rule 9-3, REC-5)" },
+  7: { label: "Underperformer", perf: "Low", pot: "Low", action: "Performance review by the Engineering Manager and HR Staff (rule 9-4, REC-6)" },
+  8: { label: "Average Performer", perf: "Medium", pot: "Low", action: "Keep in role and develop by profile (rule 9-5, REC-7)" },
+  9: { label: "Solid Performer", perf: "High", pot: "Low", action: "Keep in role and develop by profile (rule 9-5, REC-7)" },
 };
 
 export const KPI_INFO: Record<number, { name: string; rule: string; meaning: string }> = {
-  1: { name: "Trait Percentile", rule: "Yellow when a department's mean percentile on a trait is outside 40 to 60", meaning: "Where each person sits on O, C, E, A and N against 592,204 benchmark respondents." },
-  2: { name: "Decision Profile Distribution", rule: "Yellow when one profile is over 35% of a team, Red over 50%", meaning: "Share of results in each of the six decision profiles." },
-  3: { name: "Executive Fit Rate", rule: "Red when a department falls below 10%", meaning: "Share of results with a Leadership Index of 70 or more." },
-  4: { name: "Performance Index", rule: "Yellow when the Low band is over 45% of rated employees, Red over 50%", meaning: "Percentile of 0.5 × rating + 0.4 × KPI flag + 0.1 × award, banded into thirds." },
-  5: { name: "Potential Index", rule: "Green when the High band is 33.3% or more, Yellow below, Red below 25%", meaning: "Percentile of a promotion model trained on hr-ana train.csv (AUC 0.714)." },
-  6: { name: "9-Box Talent Pipeline", rule: "Yellow when Stars are under 10% of rated employees", meaning: "Share of rated employees in each 9-Box cell, plus the Star and executive-fit shortlist." },
-  7: { name: "Assessment Completion Rate", rule: "Yellow below 90%, Red below 70%", meaning: "Share of employees with a completed OCEAN result." },
+  1: { name: "Trait Percentile", rule: "Target: every completed result has all five percentiles (no alert colour)", meaning: "Where each person sits on O, C, E, A and N against 592,204 benchmark respondents." },
+  2: { name: "Decision Profile Distribution", rule: "Largest profile share: Green under 33%, Yellow 33% to 35%, Red over 35%", meaning: "Share of results in each of the six decision profiles." },
+  3: { name: "Executive Fit Rate", rule: "Green over 12%, Yellow 10% to 12%, Red under 10%", meaning: "Share of results with a Leadership Index of 70 or more." },
+  4: { name: "Performance Index", rule: "Low band of rated employees: Green under 43%, Yellow 43% to 45%, Red over 45%", meaning: "Percentile of 0.5 × rating + 0.4 × KPI flag + 0.1 × award, banded into thirds." },
+  5: { name: "Potential Index", rule: "High band: Green over 32%, Yellow 30% to 32%, Red under 30%", meaning: "Percentile of a promotion model trained on hr-ana train.csv (AUC 0.714)." },
+  6: { name: "9-Box Talent Pipeline", rule: "Stars of rated employees: Green over 12%, Yellow 10% to 12%, Red under 10%", meaning: "Share of rated employees in each 9-Box cell, plus the Star and executive-fit shortlist." },
+  7: { name: "Assessment Completion Rate", rule: "Completed within 30 days: Green over 97%, Yellow 95% to 97%, Red under 95%", meaning: "Share of employees with a completed OCEAN result." },
 };
 
 // ---------- entity dictionaries ----------
@@ -153,13 +156,68 @@ function sumStats(depts: Department[]): DepartmentStats {
   return out;
 }
 
-// ---------- KPI alert rules (report section 3.5) ----------
-const kpi2 = (share: number): Status => (share > 50 ? "red" : share > 35 ? "yellow" : "green");
-const kpi3 = (rate: number): Status => (rate < 10 ? "red" : "green");
-const kpi4 = (lowShare: number): Status => (lowShare > 50 ? "red" : lowShare > 45 ? "yellow" : "green");
-const kpi5 = (highShare: number): Status => (highShare < 25 ? "red" : highShare < 33.3 ? "yellow" : "green");
-const kpi6 = (starShare: number): Status => (starShare < 10 ? "yellow" : "green");
-const kpi7 = (rate: number): Status => (rate < 70 ? "red" : rate < 90 ? "yellow" : "green");
+// ---------- Rule set 10: KPI alert colours (Part 2, Table 37) ----------
+// Red = the Table 9 target is missed. Yellow = the target is met with 2 points
+// or less to spare (early warning). Green = met with more than 2 points.
+const atMost = (v: number, target: number): Status => (v > target ? "red" : v >= target - 2 ? "yellow" : "green");
+const atLeast = (v: number, target: number): Status => (v < target ? "red" : v <= target + 2 ? "yellow" : "green");
+const kpi2 = (share: number): Status => atMost(share, 35);
+const kpi3 = (rate: number): Status => atLeast(rate, 10);
+const kpi4 = (lowShare: number): Status => atMost(lowShare, 45);
+const kpi5 = (highShare: number): Status => atLeast(highShare, 30);
+const kpi6 = (starShare: number): Status => atLeast(starShare, 10);
+const kpi7 = (rate: number): Status => atLeast(rate, 95);
+
+const LIMIT: Record<string, string> = {
+  "KPI 2": "Red above 35%, Yellow 33% to 35%",
+  "KPI 3": "Red below 10%, Yellow 10% to 12%",
+  "KPI 4": "Red above 45%, Yellow 43% to 45%",
+  "KPI 5": "Red below 30%, Yellow 30% to 32%",
+  "KPI 6": "Red below 10%, Yellow 10% to 12%",
+  "KPI 7": "Red below 95%, Yellow 95% to 97%",
+};
+
+// ---------- Rule set 11: department situation ----------
+export type Situation = "Action needed" | "Watch" | "Healthy";
+export function situationOf(alerts: Alert[]): Situation {
+  if (alerts.some((a) => a.status === "red")) return "Action needed";
+  return alerts.some((a) => a.status === "yellow") ? "Watch" : "Healthy";
+}
+
+// ---------- Rule set 12: recommendations (Part 2, Table 41) ----------
+const KPI_REC: Record<string, { code: string; text: string; who: string }> = {
+  "KPI 2": { code: "REC-8", text: "Balance decision styles in the team when hiring and assigning work.", who: "Engineering Manager" },
+  "KPI 3": { code: "REC-9", text: "Start a leadership development programme for the department.", who: "HR Staff, CEO (budget)" },
+  "KPI 4": { code: "REC-10", text: "Run a performance review across the department.", who: "Engineering Manager, HR Staff" },
+  "KPI 5": { code: "REC-11", text: "Fund training that builds potential in the department.", who: "CEO (budget), HR Staff" },
+  "KPI 6": { code: "REC-12", text: "Review every shortlisted Star and move Growth Employees toward Star with stretch work.", who: "HR Staff, CEO" },
+  "KPI 7": { code: "REC-13", text: "Follow up every employee who has not finished the test.", who: "HR Staff, by follow-up email" },
+};
+const ruleOf = (rec: string) => `rule 12-${rec.slice(4)}`;
+
+// Rule set 9 applied to one employee, returned as the REC of rule set 12.
+function individualRec(cell: number, fit: boolean): string {
+  const label = NINE_BOX[cell].label;
+  if (cell === 3 && fit) return "REC-3 (rules 8-3, 5-1, 9-1): Star with executive fit. Add to the succession shortlist and suggest a role from the bank fit of the profile. HR Staff reviews, the CEO approves.";
+  if (cell === 1 || cell === 4) return `REC-4 (rule 9-2): ${label}. Plan coaching to lift performance to the level of the employee's potential. Who acts: HR Staff.`;
+  if (cell === 3 || cell === 2 || cell === 6) return `REC-5 (rule 9-3): ${label}${cell === 3 ? " without executive fit" : ""}. Assign stretch work; in IT Support the CTO picks tech leads by profile. Who acts: Engineering Manager or CTO.`;
+  if (cell === 7) return "REC-6 (rule 9-4): Underperformer. Start a performance review. Who acts: Engineering Manager, HR Staff.";
+  return `REC-7 (rule 9-5): ${label}. Keep the employee in the current role and develop by profile. Who acts: Engineering Manager.`;
+}
+
+// Rule set 9 counted over a scope: the six talent actions cover every employee once.
+function talentActions(s: DepartmentStats): string[] {
+  const nb = (c: string) => s.nineBox[c] ?? 0;
+  const rows: [string, string, number, string][] = [
+    ["REC-3", "9-1", s.x1StarExecutiveFit, "Succession shortlist for Stars with executive fit (HR Staff reviews, CEO approves)"],
+    ["REC-4", "9-2", nb("1") + nb("4"), "Coaching plan by HR Staff for Enigmas and Dilemmas"],
+    ["REC-5", "9-3", nb("3") - s.x1StarExecutiveFit + nb("2") + nb("6"), "Stretch work for Stars without executive fit, Growth Employees and High Performers"],
+    ["REC-6", "9-4", nb("7"), "Performance review for Underperformers"],
+    ["REC-7", "9-5", nb("5") + nb("8") + nb("9"), "Keep in role for Core Players, Average and Solid Performers"],
+    ["REC-2", "9-6", s.employees - s.rated, "Develop by profile until the first rating (not rated)"],
+  ];
+  return rows.map(([rec, rule, n, text]) => `${rec} (rule ${rule}): ${text}, ${fmt(n)} employees.`);
+}
 
 function topProfile(counts: Record<ProfileCode, number>) {
   const total = PROFILE_ORDER.reduce((a, p) => a + counts[p], 0);
@@ -174,11 +232,11 @@ function workforceAlerts(label: string, s: DepartmentStats): Alert[] {
   const high = pct(s.potentialBand.High, s.employees);
   const star = pct(s.nineBox["3"], s.rated);
   return [
-    { status: kpi2(top.share), kpi: "KPI 2", detail: `${label}: largest profile is ${profileRules[top.code].name} at ${top.share}% (alert above 35%)` },
-    { status: kpi3(fit), kpi: "KPI 3", detail: `${label}: executive fit ${fit}% (${fmt(s.executiveFit)} of ${fmt(s.employees)}, alert below 10%)` },
-    { status: kpi4(low), kpi: "KPI 4", detail: `${label}: Low performance band ${low}% of rated (alert above 45%)` },
-    { status: kpi5(high), kpi: "KPI 5", detail: `${label}: High potential band ${high}% (target 33.3% or more)` },
-    { status: kpi6(star), kpi: "KPI 6", detail: `${label}: Stars ${star}% of rated (alert below 10%)` },
+    { status: kpi2(top.share), kpi: "KPI 2", detail: `${label}: largest profile is ${profileRules[top.code].name} at ${top.share}% (${LIMIT["KPI 2"]})` },
+    { status: kpi3(fit), kpi: "KPI 3", detail: `${label}: executive fit ${fit}% (${fmt(s.executiveFit)} of ${fmt(s.employees)}; ${LIMIT["KPI 3"]})` },
+    { status: kpi4(low), kpi: "KPI 4", detail: `${label}: Low performance band ${low}% of rated (${LIMIT["KPI 4"]})` },
+    { status: kpi5(high), kpi: "KPI 5", detail: `${label}: High potential band ${high}% (${LIMIT["KPI 5"]})` },
+    { status: kpi6(star), kpi: "KPI 6", detail: `${label}: Stars ${star}% of rated (${LIMIT["KPI 6"]})` },
   ];
 }
 
@@ -204,7 +262,7 @@ function appAlerts(a: AppSummary): Alert[] {
   const out: Alert[] = [];
   if (!a.total) return out;
   const completion = pct(a.completed.length, a.total);
-  out.push({ status: kpi7(completion), kpi: "KPI 7", detail: `App: ${a.completed.length} of ${a.total} employees assessed (${completion}%, target 95%)` });
+  out.push({ status: kpi7(completion), kpi: "KPI 7", detail: `App: ${a.completed.length} of ${a.total} employees assessed (${completion}%; ${LIMIT["KPI 7"]})` });
   if (a.completed.length >= MIN_RESULTS) {
     const fit = pct(a.fit.length, a.completed.length);
     out.push({ status: kpi3(fit), kpi: "KPI 3", detail: `App: executive fit ${fit}% (${a.fit.length} of ${a.completed.length} results)` });
@@ -214,35 +272,24 @@ function appAlerts(a: AppSummary): Alert[] {
   return out;
 }
 
-// Rule-based actions for every non-green alert, most severe first.
-function actionsFor(alerts: Alert[], s: DepartmentStats | null, a: AppSummary | null): string[] {
-  const order = { red: 0, yellow: 1, green: 2 };
-  const actions: string[] = [];
-  [...alerts].sort((x, y) => order[x.status] - order[y.status]).forEach((al) => {
-    if (al.status === "green") return;
-    const where = al.detail.split(":")[0];
-    switch (al.kpi) {
-      case "KPI 7":
-        actions.push(`Send reminders to the ${a?.pending.length ?? "pending"} employee(s) without a result (Send reminder on this page).`);
-        break;
-      case "KPI 3":
-        actions.push(`${where}: too few executive-fit profiles. Widen the succession search to other departments and start leadership development for the strongest Growth Employees.`);
-        break;
-      case "KPI 2":
-        actions.push(`${where}: one decision style dominates. Balance it in the next hires and promotions, and pair leaders with a different profile on key decisions.`);
-        break;
-      case "KPI 4":
-        actions.push(`${where}: start a performance review. Put ${s ? fmt(s.nineBox["7"]) + " Underperformers and " + fmt(s.nineBox["4"]) + " Dilemmas" : "Underperformers and Dilemmas"} on performance plans with close coaching.`);
-        break;
-      case "KPI 5":
-        actions.push(`${where}: the potential pipeline is thin. Give High Performers and Core Players stretch assignments and add training.`);
-        break;
-      case "KPI 6":
-        actions.push(`${where}: too few Stars. Fast-track ${s ? fmt(s.nineBox["2"]) + " Growth Employees" : "Growth Employees"} with stretch assignments, and widen the scope of High Performers.`);
-        break;
-    }
-  });
-  return actions;
+// Rule set 12 for one department: a REC for each Red KPI (rules 12-8 to 12-13),
+// otherwise REC-14 when any KPI is Yellow and REC-15 when every KPI is Green.
+function departmentRecs(where: string, alerts: Alert[], s: DepartmentStats | null, a: AppSummary | null, onlyRed = false): string[] {
+  const reds = alerts.filter((al) => al.status === "red");
+  if (reds.length) {
+    return reds.map((al) => {
+      const r = KPI_REC[al.kpi];
+      let extra = "";
+      if (al.kpi === "KPI 4" && s) extra = ` Start with the ${fmt(s.nineBox["7"])} Underperformers.`;
+      if (al.kpi === "KPI 6" && s) extra = ` ${fmt(s.nineBox["2"])} Growth Employees can move toward Star.`;
+      if (al.kpi === "KPI 7" && a) extra = ` ${a.pending.length} employee(s) have no result yet (Send reminder on this page).`;
+      return `${where}: ${r.code} ${r.text}${extra} Who acts: ${r.who}. (${al.kpi} Red, ${ruleOf(r.code)})`;
+    });
+  }
+  if (onlyRed) return [];
+  const yellow = alerts.filter((al) => al.status === "yellow").map((al) => al.kpi);
+  if (yellow.length) return [`${where}: REC-14 Watch the department and check it again next month. Who acts: HR Staff. (${yellow.join(", ")} Yellow, rule 12-14)`];
+  return [`${where}: REC-15 The department is healthy. Keep current practices. (rule 12-15)`];
 }
 
 // ---------- intent detection ----------
@@ -256,11 +303,11 @@ function detectIntent(q: string, raw: string, ctx: BotContext): IntentId {
       /leadership index|profile|kpi|9-?box|nine.?box|band|percentile|executive fit|rule|enigma|star|steward|mobili|visionar|steady|consensus|balanced|openness|conscientious|extraver|agreeable|neurotic/.test(q)) return "explain";
   if (/pending|not (yet )?(assessed|completed|taken|done)|haven'?t|hasn'?t|has not|have not|incomplete|reminder|ยังไม่|ค้าง/.test(q)) return "pending";
   if (/shortlist|succession|candidate|promot|successor|ผู้สืบทอด|เลื่อนตำแหน่ง/.test(q) ||
-      (/executive|leader|ผู้บริหาร/.test(q) && !/rate|%|percent|kpi/.test(q))) return "shortlist";
+      (/executive|leader|ผู้บริหาร/.test(q) && !/\brates?\b|%|percent|kpi/.test(q))) return "shortlist";
   if (/9-?box|nine.?box|talent grid|enigma|growth employee|\bstars?\b|dilemma|core player|high performer|underperform|average performer|solid performer/.test(q)) return "nine_box";
   if (/recommend|suggest|should|action|advice|advise|priorit|focus|next step|what to do|แนะนำ|ควร|ทำอะไรดี/.test(q)) return "recommend";
   if (/profile|style|distribution|mobili|steward|steady hand|visionar|consensus|balanced|generalist|trait|สไตล์|โปรไฟล์/.test(q)) return "profiles";
-  if (/kpi|metric|rate|completion|overview|dashboard|summary|status|alert|health|ภาพรวม|สถิติ|ตัวชี้วัด/.test(q)) return "kpi";
+  if (/kpi|metric|\brates?\b|completion|overview|dashboard|summary|status|alert|health|ภาพรวม|สถิติ|ตัวชี้วัด/.test(q)) return "kpi";
   if (first(DEPT_ALIASES, q) || /department|compare|แผนก|เทียบ/.test(q)) return "department";
   return "fallback";
 }
@@ -326,7 +373,7 @@ function kpiOverview(ctx: BotContext, q: string): BotReply {
   const yellow = alerts.filter((a) => a.status === "yellow").length;
   return {
     intent: "kpi",
-    text: `KPI status for ${label}: ${red} red, ${yellow} yellow and ${alerts.length - red - yellow} green.`,
+    text: `KPI status for ${label}: ${red} red, ${yellow} yellow and ${alerts.length - red - yellow} green. Situation: ${situationOf(alerts)} (rule set 11).`,
     alerts,
     note: `App rows use the ${app.total} employees registered in this prototype${app.completed.length < MIN_RESULTS ? ` (KPI 2 and KPI 3 need ${MIN_RESULTS} results, ${app.completed.length} so far)` : ""}. Workforce rows use ${fmt(s.employees)} employees from employees_ocean_hr.csv.`,
     suggestions: ["What should we do first?", dept ? `Profile distribution in ${dept}` : "Compare departments", "How many Stars are there?"],
@@ -338,22 +385,31 @@ function recommend(ctx: BotContext, q: string): BotReply {
   if (dept && !inScope(ctx, dept)) return outOfScope(ctx, dept);
   const depts = dept ? [dept] : scopeDepartments(ctx);
   const app = appSummary(dept ? ctx.employees.filter((e) => e.department === dept) : ctx.employees);
-  const alerts: Alert[] = [...appAlerts(app)];
-  depts.forEach((d) => alerts.push(...workforceAlerts(d, WORKFORCE_STATS[d])));
-  const s = sumStats(depts);
+  const appAl = appAlerts(app);
+  const count = (al: Alert[], st: Status) => al.filter((x) => x.status === st).length;
+  // Rule 12-16: departments that need action are ranked by their number of Red KPIs.
+  const rows = depts.map((d) => {
+    const al = workforceAlerts(d, WORKFORCE_STATS[d]);
+    return { d, al, red: count(al, "red"), yellow: count(al, "yellow"), situation: situationOf(al) };
+  }).sort((x, y) => y.red - x.red || y.yellow - x.yellow);
   const order = { red: 0, yellow: 1, green: 2 };
-  const flagged = alerts.filter((a) => a.status !== "green").sort((x, y) => order[x.status] - order[y.status]);
+  const flagged = [...appAl, ...rows.flatMap((r) => r.al)].filter((a) => a.status !== "green").sort((x, y) => order[x.status] - order[y.status]);
+  const s = sumStats(depts);
+  const needAction = rows.filter((r) => r.red > 0);
   const actions = [
-    ...flagged.flatMap((al) => actionsFor([al], depts.length === 1 ? s : WORKFORCE_STATS[al.detail.split(":")[0]] ?? null, app)),
-    `Review the ${fmt(s.x1StarExecutiveFit)} Stars who are also executive fit for the succession pool (rule X1).`,
-    `Coach the ${fmt(s.x2FitLowPerformance)} executive-fit employees whose performance is Low before any placement (rule X2).`,
-    `Offer rotational assignments to the ${fmt(s.x3HighPotentialBalanced)} high-potential Balanced Generalists (rule X3).`,
+    ...departmentRecs("App", appAl, null, app, true),
+    ...rows.flatMap((r) => departmentRecs(r.d, r.al, WORKFORCE_STATS[r.d], null)),
+    ...talentActions(s),
   ];
   return {
     intent: "recommend",
-    text: flagged.length
-      ? `${flagged.length} KPI alert(s) need action${dept ? ` in ${dept}` : ""}. In order of severity:`
-      : `No KPI is in alert${dept ? ` for ${dept}` : ""}. Standing actions from the talent rules:`,
+    text: needAction.length
+      ? `${needAction.length} department(s) need action (rule set 11). Rule 12-16 ranks them by Red KPIs for the CEO development budget: ${needAction.map((r) => `${r.d} (${r.red} Red)`).join(", ")}.`
+      : `No department has a Red KPI${dept ? ` in ${dept}` : ""}. Recommendations from rule set 12:`,
+    table: {
+      headers: ["Department", "Situation", "Red", "Yellow"],
+      rows: rows.map((r) => [r.d, r.situation, String(r.red), String(r.yellow)]),
+    },
     alerts: flagged,
     actions,
     suggestions: ["Who should be on the succession shortlist?", "How many Enigmas are there?", "Who hasn't completed the assessment?"],
@@ -373,13 +429,13 @@ function scenario(raw: string, q: string): BotReply {
       text: `With these percentiles the person is ${prof.name} (${prof.decisionStyle.toLowerCase()}), with a Leadership Index of ${li}, so executive fit is ${fit ? "Yes" : "No"}.`,
       table: { headers: ["Trait", "Percentile", "Band"], rows: TRAIT_ORDER.map((t) => [TRAIT_META[t].name, `${p[t]}${traits[t] === undefined ? " (assumed)" : ""}`, traitBand(p[t])]) },
       bullets: [
-        `Rule applied: ${prof.code === "B" ? "R6, no trait reaches the 60th percentile" : `strongest of E, C, S (100 − N), O, A is at or above 60, so ${prof.name}`}.`,
-        `Rule ${fit ? "L1" : "L2"}: Leadership Index ${li} is ${fit ? "at or above" : "below"} ${EXECUTIVE_FIT_MIN}.`,
+        `Rule ${PROFILE_RULE[prof.code]}: ${prof.code === "B" ? "no trait reaches the 60th percentile" : `strongest of E, C, S (100 − N), O, A is at or above 60, so ${prof.name}`}.`,
+        `Rule ${fit ? "5-1 (L1)" : "5-2 (L2)"}: Leadership Index ${li} is ${fit ? "at or above" : "below"} ${EXECUTIVE_FIT_MIN}.`,
         `Fit in a bank: ${prof.description}`,
       ],
       actions: [fit
-        ? "Add to the executive-track review and check the 9-Box cell before placement (rules X1 and X2)."
-        : `Develop within the current track, in ${prof.code === "B" ? "rotational and generalist roles" : "roles that suit a " + prof.decisionStyle.toLowerCase()}.`],
+        ? "Executive fit. Give the 9-Box cell for the talent action: a Star goes to the succession shortlist (REC-3, rule 9-1)."
+        : `Not executive fit. Develop in ${prof.code === "B" ? "rotational and generalist roles" : "roles that suit a " + prof.decisionStyle.toLowerCase()}; the 9-Box cell decides REC-4 to REC-7 (rule set 9).`],
       note: missing.length ? `${missing.map((t) => TRAIT_META[t].name).join(", ")} not given, assumed at the 50th percentile.` : undefined,
       suggestions: ["How is the Leadership Index calculated?", "What is a Steward?"],
     };
@@ -388,61 +444,35 @@ function scenario(raw: string, q: string): BotReply {
   const metrics = parseMetricScenario(q);
   const alerts: Alert[] = [];
   const actions: string[] = [];
+  const KPI_OF: Record<Metric, [string, (v: number) => Status, (v: number) => string]> = {
+    completion: ["KPI 7", kpi7, (v) => `Completion ${v}%`],
+    executive_fit: ["KPI 3", kpi3, (v) => `Executive fit ${v}%`],
+    low_band: ["KPI 4", kpi4, (v) => `Low performance band ${v}% of rated employees`],
+    stars: ["KPI 6", kpi6, (v) => `Stars ${v}% of rated employees`],
+    high_potential: ["KPI 5", kpi5, (v) => `High potential band ${v}%`],
+    profile_share: ["KPI 2", kpi2, (v) => `One profile at ${v}% of the team`],
+  };
   metrics.forEach(({ metric, value }) => {
-    switch (metric) {
-      case "completion": {
-        const st = kpi7(value);
-        alerts.push({ status: st, kpi: "KPI 7", detail: `Completion ${value}% (Yellow below 90%, Red below 70%)` });
-        if (st !== "green") actions.push("Send reminders to everyone without a result and follow up again after one week.");
-        break;
-      }
-      case "executive_fit": {
-        const st = kpi3(value);
-        alerts.push({ status: st, kpi: "KPI 3", detail: `Executive fit ${value}% (Red below 10%)` });
-        if (st !== "green") actions.push("Widen the succession search to other departments and start leadership development.");
-        break;
-      }
-      case "low_band": {
-        const st = kpi4(value);
-        alerts.push({ status: st, kpi: "KPI 4", detail: `Low performance band ${value}% (Yellow above 45%, Red above 50%)` });
-        if (st !== "green") actions.push("Start a performance review: performance plans with close coaching for Underperformers and Dilemmas.");
-        break;
-      }
-      case "stars": {
-        const st = kpi6(value);
-        alerts.push({ status: st, kpi: "KPI 6", detail: `Stars ${value}% of rated employees (Yellow below 10%)` });
-        if (st !== "green") actions.push("Fast-track Growth Employees with stretch assignments and widen the scope of High Performers.");
-        break;
-      }
-      case "high_potential": {
-        const st = kpi5(value);
-        alerts.push({ status: st, kpi: "KPI 5", detail: `High potential band ${value}% (Green from 33.3%, Red below 25%)` });
-        if (st !== "green") actions.push("Give High Performers and Core Players stretch assignments to build the potential pipeline.");
-        break;
-      }
-      case "profile_share": {
-        const st = kpi2(value);
-        alerts.push({ status: st, kpi: "KPI 2", detail: `One profile at ${value}% of the team (Yellow above 35%, Red above 50%)` });
-        if (st !== "green") actions.push("Balance decision styles in the next hires and promotions, and pair leaders with a different profile on key decisions.");
-        break;
-      }
-    }
+    const [kpi, rule, describe] = KPI_OF[metric];
+    alerts.push({ status: rule(value), kpi, detail: `${describe(value)} (${LIMIT[kpi]})` });
   });
+  if (metrics.length) actions.push(...departmentRecs("Scenario", alerts, null, null).map((a) => a.replace(/^Scenario: /, "")));
   if (liMatch) {
     const li = +liMatch[1];
     const cell = first(CELL_ALIASES, q);
     const fit = li >= EXECUTIVE_FIT_MIN;
-    alerts.push({ status: fit ? "green" : "yellow", kpi: fit ? "Rule L1" : "Rule L2", detail: `Leadership Index ${li}: executive fit ${fit ? "Yes" : "No"}` });
-    if (fit && cell === 3) actions.push("Rule X1: Star and executive fit. Shortlist for upper-management succession.");
-    else if (fit && cell && NINE_BOX[cell].perf === "Low") actions.push(`Rule X2: executive fit but ${NINE_BOX[cell].label} (Low performance). Coach before any placement.`);
-    else if (fit) actions.push("Add to the executive-track review and check the 9-Box cell before placement.");
-    if (cell) actions.push(`9-Box ${NINE_BOX[cell].label}: ${NINE_BOX[cell].action}.`);
+    alerts.push({ status: fit ? "green" : "yellow", kpi: fit ? "Rule 5-1 (L1)" : "Rule 5-2 (L2)", detail: `Leadership Index ${li}: executive fit ${fit ? "Yes" : "No"}` });
+    if (/not rated|no rating|first.?year/.test(q)) actions.push("REC-2 (rule 9-6): not rated yet. Use the decision profile for development only and place the employee on the 9-Box after the first rating.");
+    else if (cell) actions.push(individualRec(cell, fit));
+    else actions.push("Give the 9-Box cell (for example Star or Enigma) to get the talent action of rule set 9.");
   }
   return {
     intent: "scenario",
-    text: alerts.length ? "Here is how the rules read your scenario:" : "I could not match a metric in that scenario.",
+    text: alerts.length
+      ? `Here is how the rules read your scenario.${metrics.length ? ` Situation: ${situationOf(alerts.filter((a) => a.kpi.startsWith("KPI")))} (rule set 11).` : ""}`
+      : "I could not match a metric in that scenario.",
     alerts,
-    actions: actions.length ? actions : ["All values are within target. Keep monitoring at the next review."],
+    actions,
     suggestions: ["Low performance band is 52% and stars are 9%", "Leadership index 74 and the employee is a Star", "E 80, C 55, O 60, A 40, N 30"],
   };
 }
@@ -467,8 +497,8 @@ function employeeAnswer(e: User): BotReply {
     table: { headers: ["Trait", "Raw", "Percentile", "Band"], rows: TRAIT_ORDER.map((t) => [TRAIT_META[t].name, String(s[t]), String(p[t]), traitBand(p[t])]) },
     bullets: [prof.decisionStyleDetail, `Fit in a bank: ${prof.description}`],
     actions: [fit
-      ? "Rule L1: executive fit. Add to the succession review and confirm performance in the 9-Box before placement (X1, X2)."
-      : "Rule L2: not executive fit. Develop in a role that matches this decision style."],
+      ? "Rule 5-1 (L1): executive fit. Confirm the 9-Box cell: a Star goes to the succession shortlist (REC-3, rule 9-1)."
+      : "Rule 5-2 (L2): not executive fit. Develop in a role that matches this decision style; the 9-Box cell decides REC-4 to REC-7 (rule set 9)."],
     suggestions: ["Who should be on the succession shortlist?", `Profile distribution in ${e.department}`],
   };
 }
@@ -486,7 +516,7 @@ function explain(q: string): BotReply {
       bullets: [
         "LI = (0.31 E + 0.28 C + 0.24 (100 − N) + 0.24 O + 0.08 A) ÷ 1.15",
         "Neuroticism is inverted, so emotional stability counts toward leadership.",
-        `Rule L1: LI of ${EXECUTIVE_FIT_MIN} or more means executive fit (about the top 15% of employees).`,
+        `Rule 5-1 (L1): LI of ${EXECUTIVE_FIT_MIN} or more means executive fit (about the top 15% of employees).`,
       ],
       suggestions: ["Leadership index 74 and the employee is a Star", "Who should be on the succession shortlist?"],
     };
@@ -535,9 +565,9 @@ function pending(ctx: BotContext, q: string): BotReply {
     text: list.length
       ? `${list.length} employee(s) have not completed the assessment. Completion is ${rate}% (KPI 7).`
       : `Everyone${dept ? ` in ${dept}` : ""} has completed the assessment (${total} of ${total}).`,
-    alerts: [{ status: kpi7(rate), kpi: "KPI 7", detail: `Completion ${rate}% (target 95%)` }],
+    alerts: [{ status: kpi7(rate), kpi: "KPI 7", detail: `Completion ${rate}% (${LIMIT["KPI 7"]})` }],
     bullets: list.map((e) => `${e.name}, ${e.department}`),
-    actions: list.length ? ["Use Send reminder next to each name in the table below."] : undefined,
+    actions: list.length ? [`${kpi7(rate) === "red" ? "REC-13 (rule 12-13): f" : "F"}ollow up every employee who has not finished the test: use Send reminder next to each name on this page.`] : undefined,
     suggestions: ["Show the KPI overview"],
   };
 }
@@ -552,7 +582,7 @@ function shortlist(ctx: BotContext, q: string): BotReply {
   return {
     intent: "shortlist",
     text: app.length
-      ? `${app.length} registered employee(s) are executive fit (rule L1), highest Leadership Index first:`
+      ? `${app.length} registered employee(s) are executive fit (rule 5-1), highest Leadership Index first:`
       : "No registered employee in your scope is executive fit yet (Leadership Index 70 or more).",
     table: app.length ? {
       headers: ["Employee", "Department", "Profile", "LI"],
@@ -562,8 +592,8 @@ function shortlist(ctx: BotContext, q: string): BotReply {
       `Workforce dataset${dept ? `, ${dept}` : ""}: ${fmt(s.executiveFit)} executive fit (${pct(s.executiveFit, s.employees)}%), of whom ${fmt(s.x1StarExecutiveFit)} are also Stars.`,
     ],
     actions: [
-      `Rule X1: put the ${fmt(s.x1StarExecutiveFit)} Star and executive-fit employees in the succession pool first.`,
-      `Rule X2: coach the ${fmt(s.x2FitLowPerformance)} executive-fit employees with Low performance before placement.`,
+      `REC-3 (rule 9-1): the ${fmt(s.x1StarExecutiveFit)} Stars with executive fit form the succession shortlist. HR Staff reviews each one and the CEO approves (KPI 6).`,
+      `REC-5 (rule 9-3): give stretch work to the ${fmt(s.nineBox["3"] - s.x1StarExecutiveFit)} Stars without executive fit.`,
     ],
     note: "The 9-Box needs HR records, so the app list shows personality fit only. Confirm performance before placement.",
     suggestions: ["How many Stars are there?", "What is the Leadership Index?"],
@@ -581,7 +611,7 @@ function nineBox(ctx: BotContext, q: string): BotReply {
       intent: "nine_box",
       text: cells.map((c) => `${NINE_BOX[c].label} (box ${c}): ${fmt(s.nineBox[c])} employees, ${pct(s.nineBox[c], s.rated)}% of ${fmt(s.rated)} rated in ${label}.`).join(" "),
       actions: cells.map((c) => `${NINE_BOX[c].label}: ${NINE_BOX[c].action}.`),
-      alerts: cells.includes(3) ? [{ status: kpi6(pct(s.nineBox["3"], s.rated)), kpi: "KPI 6", detail: `Stars ${pct(s.nineBox["3"], s.rated)}% of rated (alert below 10%)` }] : undefined,
+      alerts: cells.includes(3) ? [{ status: kpi6(pct(s.nineBox["3"], s.rated)), kpi: "KPI 6", detail: `Stars ${pct(s.nineBox["3"], s.rated)}% of rated (${LIMIT["KPI 6"]})` }] : undefined,
       note: "Workforce dataset (employees_ocean_hr.csv). Employees with no rating are not placed.",
       suggestions: ["Show the 9-Box grid", "Who should be on the succession shortlist?"],
     };
@@ -593,7 +623,7 @@ function nineBox(ctx: BotContext, q: string): BotReply {
       headers: ["Box", "Label", "Employees", "% of rated", "Action"],
       rows: Object.entries(NINE_BOX).map(([k, v]) => [k, v.label, fmt(s.nineBox[k]), `${pct(s.nineBox[k], s.rated)}%`, v.action]),
     },
-    alerts: [{ status: kpi6(pct(s.nineBox["3"], s.rated)), kpi: "KPI 6", detail: `Stars ${pct(s.nineBox["3"], s.rated)}% of rated (alert below 10%)` }],
+    alerts: [{ status: kpi6(pct(s.nineBox["3"], s.rated)), kpi: "KPI 6", detail: `Stars ${pct(s.nineBox["3"], s.rated)}% of rated (${LIMIT["KPI 6"]})` }],
     note: "Workforce dataset (employees_ocean_hr.csv).",
     suggestions: ["What should we do with Enigmas?", "Who should be on the succession shortlist?"],
   };
@@ -616,7 +646,7 @@ function profiles(ctx: BotContext, q: string): BotReply {
     intent: "profiles",
     text: `Decision profiles${dept ? ` in ${dept}` : ""}. The most common in the workforce dataset is ${profileRules[top.code].name} at ${top.share}%.`,
     table: { headers: ["Profile", `App (${app.completed.length} results)`, `Workforce (${fmt(wfTotal)})`], rows },
-    alerts: [{ status: kpi2(top.share), kpi: "KPI 2", detail: `Largest profile ${top.share}% (alert above 35%)` }],
+    alerts: [{ status: kpi2(top.share), kpi: "KPI 2", detail: `Largest profile ${top.share}% (${LIMIT["KPI 2"]})` }],
     suggestions: ["What is a Steward?", "Compare departments"],
   };
 }
@@ -638,7 +668,8 @@ function department(ctx: BotContext, q: string): BotReply {
         `9-Box: ${fmt(s.nineBox["3"])} Stars, ${fmt(s.nineBox["1"])} Enigmas, ${fmt(s.nineBox["7"])} Underperformers.`,
       ],
       alerts: [...appAlerts(app), ...workforceAlerts(dept, s)],
-      actions: actionsFor(workforceAlerts(dept, s), s, app),
+      note: `Situation: ${situationOf(workforceAlerts(dept, s))} (rule set 11).`,
+      actions: [...departmentRecs("App", appAlerts(app), null, app, true), ...departmentRecs(dept, workforceAlerts(dept, s), s, null)],
       suggestions: [`What should we do in ${dept}?`, `Profile distribution in ${dept}`],
     };
   }

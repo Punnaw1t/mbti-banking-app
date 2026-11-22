@@ -69,7 +69,9 @@ function rulesBlock(): string {
   const boxes = Object.entries(NINE_BOX).map(([n, b]) => `${n} ${b.label} (${b.perf} perf/${b.pot} pot): ${b.action}`);
   return [
     ...kpis,
-    "Executive fit = Leadership Index >= 70.",
+    "Executive fit = Leadership Index >= 70 (rule 5-1).",
+    "Department situation (rule set 11): any Red KPI = Action needed, else any Yellow = Watch, else Healthy.",
+    "Recommendations (rule set 12): REC-3 succession shortlist, REC-4 coaching plan, REC-5 stretch work, REC-6 performance review, REC-7 keep in role, REC-2 develop by profile; REC-8 to REC-13 for a Red KPI 2 to KPI 7, REC-14 Watch, REC-15 Healthy. Rule 12-16 ranks departments by Red KPIs for the CEO budget.",
     `Decision profiles: ${profiles}.`,
     "9-Box cells: " + boxes.join("; "),
   ].join("\n");
