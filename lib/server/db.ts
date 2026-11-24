@@ -10,11 +10,21 @@ declare global {
 
 export function pool(): Pool {
   if (!global.__meridianPool) {
-    const connectionString = process.env.DATABASE_URL;
+    // DATABASE_URL locally; POSTGRES_URL is what Vercel's Neon / Postgres
+    // integrations inject, so either works on Vercel. Hosted providers put
+    // `?sslmode=require` in the URL, which pg uses to turn on TLS.
+    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
     if (!connectionString) {
-      throw new Error("DATABASE_URL is not set. Copy .env.example to .env.local and start the DB with `docker compose up -d`.");
+      throw new Error("DATABASE_URL is not set. Copy .env.example to .env.local and start the DB with `docker compose up -d` (on Vercel: set DATABASE_URL in Project Settings → Environment Variables).");
     }
-    global.__meridianPool = new Pool({ connectionString, max: 5 });
+    global.__meridianPool = new Pool({
+      connectionString,
+      // Serverless functions run many instances in parallel; keep each one's
+      // share of the database's connection limit small.
+      max: process.env.VERCEL ? 3 : 5,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 10_000,
+    });
   }
   return global.__meridianPool;
 }

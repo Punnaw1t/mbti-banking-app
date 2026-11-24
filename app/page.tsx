@@ -14,13 +14,21 @@ export default function Home() {
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
-    // Look up the session while the splash plays; fall back to /login if the
-    // server or database can't be reached.
-    const targetPromise = getSessionUser()
-      .then((user) =>
-        !user ? "/login" : user.isHrFlow ? "/company" : user.result ? "/dashboard" : "/assessment",
+    // While the splash plays: without the access code go to /access; otherwise
+    // look up the session, falling back to /login if the server or database
+    // can't be reached.
+    const targetPromise = fetch("/api/access", { cache: "no-store" })
+      .then((r) => r.json())
+      .then(({ granted }) =>
+        !granted
+          ? "/access"
+          : getSessionUser()
+              .then((user) =>
+                !user ? "/login" : user.isHrFlow ? "/company" : user.result ? "/dashboard" : "/assessment",
+              )
+              .catch(() => "/login"),
       )
-      .catch(() => "/login");
+      .catch(() => "/access");
     targetPromise.then((t) => router.prefetch(t));
 
     let cancelled = false;

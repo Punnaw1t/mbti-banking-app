@@ -348,7 +348,31 @@ npm run dev
 ```
 Then open http://localhost:3000.
 
+After the splash screen the app asks for an **access code** before the login page. Set it as `ACCESS_CODE` in `.env.local` (and in your hosting provider's environment variables when deployed); ask the team for the value — it is intentionally not stored in the repo.
+
 The schema and demo data in `db/init/` load automatically the first time the database starts.
+
+### Deploying to Vercel
+1. **Database** — Vercel can't run the Docker Postgres. Create a free hosted Postgres
+   (Vercel → Storage → **Neon**, or [neon.tech](https://neon.tech) / [Supabase](https://supabase.com))
+   and copy its connection string (it ends in `?sslmode=require`).
+2. **Load the schema and demo data once** from your machine:
+   ```bash
+   DATABASE_URL="postgres://…?sslmode=require" npm run db:setup
+   DATABASE_URL="postgres://…?sslmode=require" npm run db:check
+   ```
+3. **Import the repo in Vercel** (framework: Next.js, no build settings to change) and add these
+   in Project Settings → Environment Variables:
+
+   | Name | Value | Required |
+   |---|---|---|
+   | `DATABASE_URL` | the hosted Postgres URL (not needed if the Neon integration added `POSTGRES_URL`) | yes |
+   | `ACCESS_CODE` | the access code (ask the team; not stored in the repo) | yes — without it nobody gets past `/access` |
+   | `LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY` | a cloud LLM, e.g. Groq (see `.env.example`) | no — without them the chatbot uses rule-based answers |
+   | `ALLOW_DEMO_RESET` | `true` to keep the "Reset demo data" button working | no |
+
+4. **Redeploy** after changing any variable — Vercel only reads them at deploy time.
+   Then check `https://<your-app>.vercel.app/api/health`.
 
 ### 9.1 Checking the database
 | How | What it shows |

@@ -5,7 +5,9 @@ export type ChatMessage = { role: "system" | "user" | "assistant"; content: stri
 
 export function llmConfig() {
   return {
-    disabled: process.env.LLM_DISABLED === "true",
+    // On Vercel there is no local Ollama, so without LLM_BASE_URL skip the LLM
+    // (rule-based answers only) instead of waiting on localhost to time out.
+    disabled: process.env.LLM_DISABLED === "true" || (!!process.env.VERCEL && !process.env.LLM_BASE_URL),
     baseUrl: (process.env.LLM_BASE_URL || "http://localhost:11434/v1").replace(/\/+$/, ""),
     model: process.env.LLM_MODEL || "qwen2.5:3b",
     apiKey: process.env.LLM_API_KEY || "",

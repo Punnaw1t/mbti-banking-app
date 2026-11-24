@@ -6,6 +6,8 @@ import { llmStatus, streamChat } from "@/lib/server/llm";
 import { getViewableDepartments } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+// Room for a streamed LLM reply on Vercel (default function timeout is shorter).
+export const maxDuration = 60;
 
 // GET /api/chat — is the LLM ready? (shown in the chatbot header)
 export const GET = handle(async () => {

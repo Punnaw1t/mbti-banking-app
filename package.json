@@ -11,6 +11,7 @@
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d",
     "db:check": "node scripts/db-check.mjs",
+    "db:setup": "node scripts/db-setup.mjs",
     "db:psql": "docker compose exec db psql -U meridian -d meridian"
   },
   "dependencies": {

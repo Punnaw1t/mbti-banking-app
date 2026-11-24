@@ -4,10 +4,10 @@ import { readFileSync } from "fs";
 import pg from "pg";
 
 function loadEnv() {
-  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.DATABASE_URL || process.env.POSTGRES_URL) return process.env.DATABASE_URL || process.env.POSTGRES_URL;
   try {
     const line = readFileSync(".env.local", "utf8").split("\n").find((l) => l.startsWith("DATABASE_URL="));
-    if (line) return line.slice("DATABASE_URL=".length).trim();
+    if (line) return line.slice("DATABASE_URL=".length).trim().replace(/^["']|["']$/g, "");
   } catch {}
   return "postgres://meridian:meridian@localhost:5433/meridian";
 }
