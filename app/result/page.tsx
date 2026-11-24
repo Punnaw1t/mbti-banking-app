@@ -31,7 +31,7 @@ export default function ResultPage() {
   return (
     <div className="min-h-screen">
       <TopBar user={user} tag="Assessment Result" />
-      <main className="mx-auto max-w-4xl px-5 sm:px-8 py-10 sm:py-16">
+      <main className="mx-auto max-w-4xl px-4 sm:px-8 py-8 sm:py-16">
         <p className="text-xs uppercase tracking-widest text-brass mb-3">Your result</p>
         <h1 className="font-display text-3xl sm:text-4xl text-slate-50 mb-2">{profile.name}</h1>
         <p className="text-slate-400 mb-8">{profile.decisionStyle}</p>

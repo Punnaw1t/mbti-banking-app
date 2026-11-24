@@ -192,11 +192,11 @@ export default function DashboardsPage() {
     <div className="min-h-screen">
       <TopBar user={me} tag="Company Decision-Style Oversight" boldTag />
 
-      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-14">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">HR Executive · Visual Analytics</p>
-            <h1 className="font-display text-3xl text-slate-50">Dashboards</h1>
+            <h1 className="font-display text-2xl sm:text-3xl text-slate-50">Dashboards</h1>
             <p className="text-slate-400 text-sm mt-1">
               Keep the Tableau, Power BI or Looker Studio dashboards built from the "Export for Visualize" data in one place.
             </p>
@@ -391,7 +391,7 @@ function DashboardViewer({ dashboard: d, onDelete }: { dashboard: SavedDashboard
   }, [d.id, isFile]);
 
   const subtitle = isFile && d.file ? `${d.file.name} · ${formatBytes(d.file.size)}` : new URL(d.url).hostname;
-  const frameClass = "w-full h-[70vh] min-h-[480px] bg-white";
+  const frameClass = "w-full h-[70dvh] min-h-[420px] sm:min-h-[480px] bg-white";
 
   let body: ReactNode;
   if (!isFile) {
@@ -421,7 +421,7 @@ function DashboardViewer({ dashboard: d, onDelete }: { dashboard: SavedDashboard
 
   return (
     <section className="bg-ink-800 border border-hairline/10 rounded-lg overflow-hidden min-w-0">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-hairline/10">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 border-b border-hairline/10">
         <div className="min-w-0">
           <p className="text-slate-50 truncate">{d.title}</p>
           <p className="text-xs text-slate-500 truncate">{subtitle}</p>

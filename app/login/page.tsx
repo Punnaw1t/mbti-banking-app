@@ -73,7 +73,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 py-12">
+    <div className="min-h-screen flex items-center justify-center px-5 pt-20 pb-12 sm:py-12">
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
         <CreditsToggle className="bg-ink-800" />
         <ThemeToggle className="bg-ink-800" />

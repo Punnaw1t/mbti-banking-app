@@ -60,12 +60,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 py-12">
+    <div className="min-h-screen flex items-center justify-center px-5 pt-20 pb-12 sm:py-12">
       <ThemeToggle className="fixed top-4 right-4 bg-ink-800" />
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-widest text-brass mb-2">Siam Bank Corp · Internal Tool</p>
-          <h1 className="font-display text-3xl text-slate-50">Create your account</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-slate-50">Create your account</h1>
           <p className="text-slate-400 text-sm mt-2">Step 1 of the executive decision-style assessment</p>
         </div>
 

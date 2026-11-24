@@ -64,11 +64,11 @@ export default function AccountPage() {
     <div className="min-h-screen">
       <TopBar user={me} tag="Account settings" />
 
-      <main className="mx-auto max-w-md px-5 sm:px-0 py-10 sm:py-14">
+      <main className="mx-auto max-w-md px-4 sm:px-0 py-8 sm:py-14">
         <Link href={backHref} className="text-sm text-slate-400 hover:text-brass">
           ← Back to {me.isHrFlow ? "Company Overview" : "Dashboard"}
         </Link>
-        <h1 className="font-display text-3xl text-slate-50 mt-4">Account settings</h1>
+        <h1 className="font-display text-2xl sm:text-3xl text-slate-50 mt-4">Account settings</h1>
         <p className="text-slate-400 text-sm mt-1 mb-8">Change the username and password you sign in with.</p>
 
         <div className="bg-ink-800 border border-hairline/10 rounded-lg p-5 mb-6 text-sm grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">

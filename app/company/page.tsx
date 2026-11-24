@@ -109,11 +109,11 @@ export default function CompanyPage() {
     <div className="min-h-screen">
       <TopBar user={me} tag="Company Decision-Style Oversight" boldTag />
 
-      <main className="mx-auto max-w-6xl px-5 sm:px-8 py-10 sm:py-14">
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 pt-8 sm:pt-14 pb-28">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-brass mb-2">HR Executive · Recruitment &amp; Talent Review</p>
-            <h1 className="font-display text-3xl text-slate-50">Company OCEAN Overview</h1>
+            <h1 className="font-display text-2xl sm:text-3xl text-slate-50">Company OCEAN Overview</h1>
             <p className="text-slate-400 text-sm mt-1">
               Review decision-making personality and style across candidates for upper-management roles, and follow up
               with employees directly.
@@ -125,20 +125,20 @@ export default function CompanyPage() {
           </div>
           <button
             onClick={handleExportCsv}
-            className="text-sm px-4 py-2.5 rounded-md bg-brass text-midnight font-medium hover:bg-brass-light transition-colors self-start whitespace-nowrap"
+            className="w-full sm:w-auto text-sm px-4 py-2.5 rounded-md bg-brass text-midnight font-medium hover:bg-brass-light transition-colors self-start whitespace-nowrap"
           >
             Export for Visualize
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <StatCard label="Employees" value={stats.total} />
           <StatCard label="Assessed" value={stats.completed} />
           <StatCard label="Pending" value={stats.pending} accent="amber" />
           <StatCard label="Executive-fit profiles" value={stats.executiveFit} accent="brass" />
         </div>
 
-        <div className="flex flex-wrap gap-3 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-5">
           <select
             value={deptFilter}
             onChange={(e) => setDeptFilter(e.target.value)}
@@ -167,14 +167,57 @@ export default function CompanyPage() {
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
             placeholder="Search employee name…"
-            className="rounded-md bg-ink-800 border border-hairline/10 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-brass outline-none"
+            className="lg:min-w-[220px] rounded-md bg-ink-800 border border-hairline/10 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-brass outline-none"
           />
         </div>
         <p className="text-xs text-slate-500 -mt-3 mb-5">
           "Export CSV" downloads the {filtered.length} employee{filtered.length === 1 ? "" : "s"} matching the filters above.
         </p>
 
-        <div className="bg-ink-800 border border-hairline/10 rounded-lg overflow-hidden">
+        {/* Phones and portrait tablets: one card per employee. */}
+        <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-3">
+          {filtered.map((emp) => (
+            <div
+              key={emp.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => setViewing(emp)}
+              onKeyDown={(e) => { if (e.key === "Enter") setViewing(emp); }}
+              className="bg-ink-800 border border-hairline/10 rounded-lg p-4 cursor-pointer active:bg-hairline/5 transition-colors"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-slate-50 truncate">{emp.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{emp.email}</p>
+                  <p className="text-xs text-slate-300 [html.light_&]:text-black mt-1">{emp.department}</p>
+                </div>
+                {emp.result ? (
+                  <span className="text-signal-green text-xs shrink-0">Completed</span>
+                ) : (
+                  <span className="text-signal-amber text-xs shrink-0">Pending</span>
+                )}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                {emp.result ? (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <OceanRadarMini percentiles={percentiles(emp.result.scores)} />
+                    <ProfileBadge scores={emp.result.scores} size="sm" />
+                  </div>
+                ) : (
+                  <span className="text-slate-600 text-xs">Not assessed</span>
+                )}
+                <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <FollowUpLink employee={emp} fromName={me.name} onClick={() => handleFollowUpClick(emp)} />
+                </div>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <p className="md:col-span-2 bg-ink-800 border border-hairline/10 rounded-lg px-5 py-8 text-center text-slate-500 text-sm">No employees match these filters.</p>
+          )}
+        </div>
+
+        <div className="hidden lg:block bg-ink-800 border border-hairline/10 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -234,8 +277,8 @@ export default function CompanyPage() {
             <div className="space-y-2">
               {log.slice(0, 5).map((entry) => (
                 <div key={entry.id} className="bg-ink-800 border border-hairline/10 rounded-md px-4 py-3 text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                  <span className="text-slate-200">{entry.subject} <span className="text-slate-500">→ {entry.toEmail}</span></span>
-                  <span className="text-xs text-slate-500">{new Date(entry.sentAt).toLocaleString()}</span>
+                  <span className="text-slate-200 min-w-0 break-words">{entry.subject} <span className="text-slate-500 break-all">→ {entry.toEmail}</span></span>
+                  <span className="text-xs text-slate-500 shrink-0">{new Date(entry.sentAt).toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -248,7 +291,7 @@ export default function CompanyPage() {
       {botContext && <HrChatbot context={botContext} />}
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink-700 border border-brass/40 text-slate-50 text-sm px-5 py-3 rounded-md shadow-panel">
+        <div className="fixed bottom-24 sm:bottom-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 text-center bg-ink-700 border border-brass/40 text-slate-50 text-sm px-5 py-3 rounded-md shadow-panel">
           {toast}
         </div>
       )}
@@ -270,7 +313,7 @@ function FollowUpLink({
     <a
       href={buildMailtoHref(employee.email, subject, body)}
       onClick={onClick}
-      className="inline-block text-xs px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
+      className="inline-block whitespace-nowrap text-xs px-3 py-1.5 rounded-md border border-hairline/15 text-slate-200 hover:border-brass hover:text-brass transition-colors"
     >
       {employee.result ? "Send follow-up" : "Send reminder"}
     </a>

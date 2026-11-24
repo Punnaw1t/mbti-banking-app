@@ -16,13 +16,13 @@ export default function EmployeeDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-3 sm:px-4 sm:py-8"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl max-h-full overflow-y-auto bg-ink-800 border border-hairline/10 rounded-lg shadow-panel p-6 sm:p-8"
+        className="w-full max-w-2xl max-h-full overflow-y-auto bg-ink-800 border border-hairline/10 rounded-lg shadow-panel p-5 sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 mb-6">

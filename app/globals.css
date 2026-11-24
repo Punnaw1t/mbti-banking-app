@@ -251,3 +251,16 @@ input[type="range"] {
 @media (prefers-reduced-motion: reduce) {
   .chat-dots span, .chat-caret { animation: none; }
 }
+
+/* Phones: iOS Safari zooms the page when a focused field's text is under 16px,
+   so form controls use 16px on small screens. */
+@media (max-width: 639px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Never let the page scroll sideways on narrow screens. */
+html, body {
+  overflow-x: clip;
+}

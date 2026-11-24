@@ -86,7 +86,7 @@ export default function AssessmentPage() {
     <div className="min-h-screen">
       <TopBar user={user} tag="OCEAN Personality Assessment" />
 
-      <main className="mx-auto max-w-2xl px-5 sm:px-8 py-10 sm:py-16">
+      <main className="mx-auto max-w-2xl px-4 sm:px-8 py-8 sm:py-16">
         <div className="mb-8">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <span>Statement {step + 1} of {total}</span>

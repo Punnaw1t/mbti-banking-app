@@ -149,7 +149,7 @@ export default function HrChatbot({ context }: { context: BotContext }) {
   const launcher = (
     <button
       onClick={() => setOpen(!open)}
-      className={`group fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full text-midnight shadow-panel ring-4 ring-brass/20 hover:scale-105 transition flex items-center justify-center ${
+      className={`group fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 h-14 w-14 rounded-full text-midnight shadow-panel ring-4 ring-brass/20 hover:scale-105 transition flex items-center justify-center ${
         open ? "bg-brass hover:bg-brass-light" : "bg-midnight"
       }`}
       aria-label={open ? "Close the HR assistant" : "Open the HR assistant"}
@@ -170,7 +170,7 @@ export default function HrChatbot({ context }: { context: BotContext }) {
     <>
     {launcher}
     <section
-      className="fixed z-40 bottom-24 right-4 left-4 sm:left-auto sm:right-6 sm:w-[420px] h-[min(600px,calc(100vh-8rem))] flex flex-col bg-ink-800 border border-hairline/15 rounded-lg shadow-panel"
+      className="fixed z-40 bottom-[5.5rem] sm:bottom-24 right-3 left-3 sm:left-auto sm:right-6 sm:w-[420px] h-[min(600px,calc(100dvh-7rem))] flex flex-col bg-ink-800 border border-hairline/15 rounded-lg shadow-panel"
       aria-label="HR assistant"
     >
       <header className="flex items-center justify-between px-4 py-3 border-b border-hairline/10">

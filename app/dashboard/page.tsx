@@ -32,11 +32,11 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen">
       <TopBar user={user} tag="My Dashboard" />
-      <main className="mx-auto max-w-5xl px-5 sm:px-8 py-10 sm:py-14">
+      <main className="mx-auto max-w-5xl px-4 sm:px-8 py-8 sm:py-14">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
             <p className="text-xs uppercase tracking-widest text-brass mb-2">Welcome back</p>
-            <h1 className="font-display text-3xl text-slate-50">{user.name}</h1>
+            <h1 className="font-display text-2xl sm:text-3xl text-slate-50">{user.name}</h1>
             <p className="text-slate-400 text-sm mt-1">{user.department} · Siam Bank Corp</p>
           </div>
           <button
@@ -50,7 +50,7 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-3 gap-5">
           <div className="md:col-span-1 bg-ink-800 border border-brass/30 rounded-lg p-6">
             <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Your decision profile</p>
-            <p className="font-display text-3xl text-slate-50 mb-3">{profile.name}</p>
+            <p className="font-display text-2xl sm:text-3xl text-slate-50 mb-3">{profile.name}</p>
             <ProfileBadge scores={scores} />
             <p className="text-sm text-slate-300 [html.light_&]:text-black mt-4 leading-relaxed">{profile.description}</p>
             <div className="mt-5 pt-5 border-t border-hairline/10">
